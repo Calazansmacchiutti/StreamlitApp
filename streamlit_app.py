@@ -29,7 +29,7 @@ dataset_options = {
 }
 
 selected_dataset = st.selectbox(
-    'Select dataset',
+    'Escolha o dataset abaixo',
     list(dataset_options.keys())
 )
 
@@ -43,7 +43,7 @@ if df.empty:
 # Selecionar a coluna de data/hora se 'timestamp' não estiver presente
 if 'timestamp' not in df.columns:
     date_column = st.selectbox(
-        "Select the date/time column",
+        "Verifique se esta selecionado DateTime abaixo",
         df.columns
     )
     df['timestamp'] = pd.to_datetime(df[date_column])
@@ -51,25 +51,25 @@ else:
     df['timestamp'] = pd.to_datetime(df['timestamp'])
 
 # Seleção das variáveis para o eixo Y
-st.markdown("## Select Variables for Y-axis")
+st.markdown("## Selecione as variáveis para graficar")
 columns = [col for col in df.columns if col not in ['timestamp', date_column]]
 selected_columns = st.multiselect(
-    'Which columns would you like to plot?',
+    'Quais colunas você gostaria de selcionar?',
     columns
 )
 
 # Se nenhuma coluna for selecionada, parar a execução
 if not selected_columns:
-    st.warning("Please select at least one column.")
+    st.warning("Por favor, escolha ao menos uma coluna.")
     st.stop()
 
 # Seleção do intervalo de tempo
-st.markdown("## Select Time Range")
+st.markdown("## Selecione o intervalo de tempo")
 min_date = df['timestamp'].min().to_pydatetime()
 max_date = df['timestamp'].max().to_pydatetime()
 
 date_range = st.slider(
-    'Select the range of dates',
+    'Selecione o intervalo de tempo',
     min_value=min_date,
     max_value=max_date,
     value=[min_date, max_date],
@@ -79,16 +79,16 @@ date_range = st.slider(
 # Filtrar os dados com base no intervalo de tempo selecionado
 filtered_df = df[(df['timestamp'] >= date_range[0]) & (df['timestamp'] <= date_range[1])]
 
-# Plotar o gráfico
+# Plotar o gráfico com plotly express
 st.markdown("## Data Plot")
 fig = px.line()
 
 for column in selected_columns:
     fig.add_scatter(x=filtered_df['timestamp'], y=filtered_df[column], mode='lines', name=column)
 
-# Adicionar eixos Y adicionais se houver mais de três variáveis selecionadas
-if len(selected_columns) > 4:
-    for i, column in enumerate(selected_columns[4:], start=1):
+# Adicionar eixos Y adicionais se houver mais de N variáveis selecionadas
+if len(selected_columns) > 6:
+    for i, column in enumerate(selected_columns[6:], start=1):
         fig.update_traces(yaxis=f"y{i+1}", selector=dict(name=column))
         fig.add_scatter(x=filtered_df['timestamp'], y=filtered_df[column], mode='lines', name=column, yaxis=f"y{i+1}")
 
