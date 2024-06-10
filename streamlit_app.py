@@ -126,7 +126,7 @@ def plot_correlation_matrix():
 def plot_box_plot():
     if len(selected_columns) > 0:
         # Amostrar os dados se o conjunto for muito grande
-        sample_size = min(10000, len(filtered_df))
+        sample_size = min(100000, len(filtered_df))
         sampled_df = filtered_df.sample(n=sample_size, random_state=42)
         
         melted_df = sampled_df.melt(id_vars=['timestamp'], value_vars=selected_columns)
