@@ -97,7 +97,7 @@ if len(selected_columns) > 3:
         yaxis2=dict(title=selected_columns[3], overlaying='y', side='right'),
         yaxis3=dict(title=selected_columns[4], overlaying='y', side='right', anchor='free', position=0.95),
         yaxis4=dict(title=selected_columns[5], overlaying='y', side='right', anchor='free', position=0.90),
-        yaxis4=dict(title=selected_columns[5], overlaying='y', side='right', anchor='free', position=0.90),
+        yaxis5=dict(title=selected_columns[6], overlaying='y', side='right', anchor='free', position=0.90),
     )
 
 st.plotly_chart(fig)
