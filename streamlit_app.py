@@ -83,7 +83,7 @@ filtered_df = df[(df['timestamp'] >= date_range[0]) & (df['timestamp'] <= date_r
 st.markdown("## Escolha o gráfico para exibição")
 selected_plot = st.selectbox(
     'Escolha o gráfico que deseja exibir',
-    ['Linha', 'Matriz de Correlação', 'Box Plot']
+    ['Linha X vs Y', 'Matriz de Correlação', 'Box Plot']
 )
 
 # Função para plotar gráfico de linha
@@ -126,7 +126,7 @@ def plot_correlation_matrix():
 def plot_box_plot():
     if len(selected_columns) > 0:
         # Amostrar os dados se o conjunto for muito grande
-        sample_size = min(1000, len(filtered_df))
+        sample_size = min(10000, len(filtered_df))
         sampled_df = filtered_df.sample(n=sample_size, random_state=42)
         
         melted_df = sampled_df.melt(id_vars=['timestamp'], value_vars=selected_columns)
@@ -136,7 +136,7 @@ def plot_box_plot():
         st.warning("Selecione pelo menos uma coluna para visualizar o box plot.")
 
 # Exibir o gráfico selecionado
-if selected_plot == 'Linha':
+if selected_plot == 'Linha X vs Y':
     plot_line_chart()
 elif selected_plot == 'Matriz de Correlação':
     plot_correlation_matrix()
