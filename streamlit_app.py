@@ -101,3 +101,16 @@ if len(selected_columns) > 6:
     )
 
 st.plotly_chart(fig)
+
+# Exibir a matriz de correlação
+if len(selected_columns) > 1:
+    st.markdown("## Correlation Matrix")
+    correlation_matrix = filtered_df[selected_columns].corr()
+    fig_corr = px.imshow(correlation_matrix,
+                         text_auto=True,
+                         aspect="auto",
+                         color_continuous_scale='RdBu_r',
+                         zmin=-1, zmax=1)
+    st.plotly_chart(fig_corr)
+else:
+    st.warning("Selecione mais de uma coluna para visualizar a matriz de correlação.")
