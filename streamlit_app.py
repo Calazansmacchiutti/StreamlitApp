@@ -79,14 +79,14 @@ date_range = st.slider(
 # Filtrar os dados com base no intervalo de tempo selecionado
 filtered_df = df[(df['timestamp'] >= date_range[0]) & (df['timestamp'] <= date_range[1])]
 
-# Plotar o gráfico com plotly express
+# Plotar o gráfico de linha com plotly express
 st.markdown("## Data Plot")
 fig = px.line()
 
 for column in selected_columns:
     fig.add_scatter(x=filtered_df['timestamp'], y=filtered_df[column], mode='lines', name=column)
 
-# Adicionar eixos Y adicionais se houver mais de N variáveis selecionadas
+# Adicionar eixos Y adicionais se houver mais de 6 variáveis selecionadas
 if len(selected_columns) > 6:
     for i, column in enumerate(selected_columns[6:], start=1):
         fig.update_traces(yaxis=f"y{i+1}", selector=dict(name=column))
@@ -97,14 +97,14 @@ if len(selected_columns) > 6:
         yaxis2=dict(title=selected_columns[3], overlaying='y', side='right'),
         yaxis3=dict(title=selected_columns[4], overlaying='y', side='right', anchor='free', position=0.95),
         yaxis4=dict(title=selected_columns[5], overlaying='y', side='right', anchor='free', position=0.90),
-        yaxis5=dict(title=selected_columns[6], overlaying='y', side='right', anchor='free', position=0.90),
+        yaxis5=dict(title=selected_columns[6], overlaying='y', side='right', anchor='free', position=0.85),
     )
 
 st.plotly_chart(fig)
 
 # Exibir a matriz de correlação
 if len(selected_columns) > 1:
-    st.markdown("## Correlation Matrix")
+    st.markdown("## Matriz de correlação")
     correlation_matrix = filtered_df[selected_columns].corr()
     fig_corr = px.imshow(correlation_matrix,
                          text_auto=True,
@@ -114,3 +114,12 @@ if len(selected_columns) > 1:
     st.plotly_chart(fig_corr)
 else:
     st.warning("Selecione mais de uma coluna para visualizar a matriz de correlação.")
+
+# Exibir o box plot
+if len(selected_columns) > 0:
+    st.markdown("## Box Plot")
+    melted_df = filtered_df.melt(id_vars=['timestamp'], value_vars=selected_columns)
+    fig_box = px.box(melted_df, x='variable', y='value', points="all")
+    st.plotly_chart(fig_box)
+else:
+    st.warning("Selecione pelo menos uma coluna para visualizar o box plot.")
