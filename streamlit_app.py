@@ -85,7 +85,7 @@ filtered_df = df[(df['timestamp'] >= date_range[0]) & (df['timestamp'] <= date_r
 st.markdown("## Escolha o gráfico para exibição")
 selected_plot = st.selectbox(
     'Escolha o gráfico que deseja exibir',
-    ['Linha X vs Y', 'Matriz de Correlação', 'Box Plot', 'Histograma']
+    ['Linha X vs Y', 'Matriz de Correlação', 'Box Plot', 'Histograma', 'Covariância ao longo do tempo']
 )
 
 # Função para plotar gráfico de linha
@@ -154,6 +154,29 @@ def plot_histogram():
     else:
         st.warning("Selecione pelo menos uma coluna para visualizar o histograma.")
 
+# Função para plotar covariância ao longo do tempo
+def plot_time_covariance():
+    if len(selected_columns) < 2:
+        st.warning("Selecione pelo menos duas colunas para visualizar a covariância.")
+        return
+
+    # Seleção do tamanho da janela para a covariância móvel
+    window_size = st.slider("Selecione o tamanho da janela para a covariância móvel:", min_value=2, max_value=50, value=10)
+
+    # Calculando a covariância móvel
+    cov_df = pd.DataFrame()
+    for i in range(len(selected_columns)):
+        for j in range(i + 1, len(selected_columns)):
+            cov_col_name = f"{selected_columns[i]}-{selected_columns[j]}"
+            cov_df[cov_col_name] = filtered_df[selected_columns[i]].rolling(window=window_size).cov(filtered_df[selected_columns[j]])
+
+    cov_df['timestamp'] = filtered_df['timestamp']
+
+    # Plotar covariância ao longo do tempo
+    fig_cov = px.scatter(cov_df, x='timestamp', y=cov_df.columns[:-1], title="Covariância ao longo do tempo")
+
+    st.plotly_chart(fig_cov)
+
 # Exibir o gráfico selecionado
 if selected_plot == 'Linha X vs Y':
     plot_line_chart()
@@ -163,3 +186,5 @@ elif selected_plot == 'Box Plot':
     plot_box_plot()
 elif selected_plot == 'Histograma':
     plot_histogram()
+elif selected_plot == 'Covariância ao longo do tempo':
+    plot_time_covariance()
