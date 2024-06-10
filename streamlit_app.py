@@ -87,8 +87,8 @@ for column in selected_columns:
     fig.add_scatter(x=filtered_df['timestamp'], y=filtered_df[column], mode='lines', name=column)
 
 # Adicionar eixos Y adicionais se houver mais de três variáveis selecionadas
-if len(selected_columns) > 3:
-    for i, column in enumerate(selected_columns[3:], start=1):
+if len(selected_columns) > 4:
+    for i, column in enumerate(selected_columns[4:], start=1):
         fig.update_traces(yaxis=f"y{i+1}", selector=dict(name=column))
         fig.add_scatter(x=filtered_df['timestamp'], y=filtered_df[column], mode='lines', name=column, yaxis=f"y{i+1}")
 
