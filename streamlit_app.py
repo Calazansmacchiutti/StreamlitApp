@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from pathlib import Path
+import numpy as np
+import scipy.stats as stats
 
 # Configurar o título e o ícone da página
 st.set_page_config(
@@ -54,7 +56,7 @@ else:
 st.markdown("## Selecione as variáveis para graficar")
 columns = [col for col in df.columns if col not in ['timestamp', date_column]]
 selected_columns = st.multiselect(
-    'Quais colunas você gostaria de selcionar?',
+    'Quais colunas você gostaria de selecionar?',
     columns
 )
 
@@ -83,7 +85,7 @@ filtered_df = df[(df['timestamp'] >= date_range[0]) & (df['timestamp'] <= date_r
 st.markdown("## Escolha o gráfico para exibição")
 selected_plot = st.selectbox(
     'Escolha o gráfico que deseja exibir',
-    ['Linha X vs Y', 'Matriz de Correlação', 'Box Plot']
+    ['Linha X vs Y', 'Matriz de Correlação', 'Box Plot', 'Histograma']
 )
 
 # Função para plotar gráfico de linha
@@ -135,6 +137,23 @@ def plot_box_plot():
     else:
         st.warning("Selecione pelo menos uma coluna para visualizar o box plot.")
 
+# Função para plotar histograma
+def plot_histogram():
+    if len(selected_columns) > 0:
+        for column in selected_columns:
+            fig_hist = px.histogram(filtered_df, x=column, nbins=30, title=f'Histograma de {column}')
+            st.plotly_chart(fig_hist)
+
+            # Cálculo dos intervalos de confiança
+            data = filtered_df[column].dropna()
+            mean = np.mean(data)
+            std_dev = np.std(data)
+            conf_interval = stats.norm.interval(0.95, loc=mean, scale=std_dev/np.sqrt(len(data)))
+
+            st.write(f"**{column}**: Intervalo de confiança de 95%: {conf_interval}")
+    else:
+        st.warning("Selecione pelo menos uma coluna para visualizar o histograma.")
+
 # Exibir o gráfico selecionado
 if selected_plot == 'Linha X vs Y':
     plot_line_chart()
@@ -142,3 +161,5 @@ elif selected_plot == 'Matriz de Correlação':
     plot_correlation_matrix()
 elif selected_plot == 'Box Plot':
     plot_box_plot()
+elif selected_plot == 'Histograma':
+    plot_histogram()
