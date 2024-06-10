@@ -125,8 +125,12 @@ def plot_correlation_matrix():
 # Função para plotar box plot
 def plot_box_plot():
     if len(selected_columns) > 0:
-        melted_df = filtered_df.melt(id_vars=['timestamp'], value_vars=selected_columns)
-        fig_box = px.box(melted_df, x='variable', y='value', points="all")
+        # Amostrar os dados se o conjunto for muito grande
+        sample_size = min(1000, len(filtered_df))
+        sampled_df = filtered_df.sample(n=sample_size, random_state=42)
+        
+        melted_df = sampled_df.melt(id_vars=['timestamp'], value_vars=selected_columns)
+        fig_box = px.box(melted_df, x='variable', y='value', points=False)  # Removendo pontos individuais para otimização
         st.plotly_chart(fig_box)
     else:
         st.warning("Selecione pelo menos uma coluna para visualizar o box plot.")
