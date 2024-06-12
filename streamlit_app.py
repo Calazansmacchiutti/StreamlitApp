@@ -205,14 +205,14 @@ def plot_arima_decomposition():
 
     # Criação de subplots para cada componente da decomposição
     fig = make_subplots(rows=4, cols=1, shared_xaxes=True, 
-                        subplot_titles=("Original", "Trend", "Seasonal", "Residual"))
+                        subplot_titles=("Dado original", "Tendência", "Sazonalidade", "Residuos"))
 
-    fig.add_trace(go.Scatter(x=ts_data.index, y=ts_data, mode='lines', name='Original'), row=1, col=1)
-    fig.add_trace(go.Scatter(x=decomposition.trend.index, y=decomposition.trend, mode='lines', name='Trend'), row=2, col=1)
-    fig.add_trace(go.Scatter(x=decomposition.seasonal.index, y=decomposition.seasonal, mode='lines', name='Seasonal'), row=3, col=1)
-    fig.add_trace(go.Scatter(x=decomposition.resid.index, y=decomposition.resid, mode='lines', name='Residual'), row=4, col=1)
+    fig.add_trace(go.Scatter(x=ts_data.index, y=ts_data, mode='lines', name='Dado original'), row=1, col=1)
+    fig.add_trace(go.Scatter(x=decomposition.trend.index, y=decomposition.trend, mode='lines', name='Tendência'), row=2, col=1)
+    fig.add_trace(go.Scatter(x=decomposition.seasonal.index, y=decomposition.seasonal, mode='lines', name='Sazonalidade'), row=3, col=1)
+    fig.add_trace(go.Scatter(x=decomposition.resid.index, y=decomposition.resid, mode='lines', name='Residuos'), row=4, col=1)
 
-    fig.update_layout(height=800, title_text="ARIMA Decomposition")
+    fig.update_layout(height=800, title_text="Decomposição de série")
 
     st.plotly_chart(fig)
 
@@ -227,5 +227,5 @@ elif selected_plot == 'Histograma':
     plot_histogram()
 elif selected_plot == 'Covariância ao longo do tempo':
     plot_time_covariance()
-elif selected_plot == 'ARIMA Decomposition':
+elif selected_plot == 'Decomposição de série':
     plot_arima_decomposition()   
