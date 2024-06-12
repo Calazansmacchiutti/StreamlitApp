@@ -4,6 +4,8 @@ import plotly.express as px
 from pathlib import Path
 import numpy as np
 import scipy.stats as stats
+from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.tsa.arima.model import ARIMA
 
 # Configurar o título e o ícone da página
 st.set_page_config(
@@ -85,7 +87,7 @@ filtered_df = df[(df['timestamp'] >= date_range[0]) & (df['timestamp'] <= date_r
 st.markdown("## Escolha o gráfico para exibição")
 selected_plot = st.selectbox(
     'Escolha o gráfico que deseja exibir',
-    ['Linha X vs Y', 'Matriz de Correlação', 'Box Plot', 'Histograma', 'Covariância ao longo do tempo']
+    ['Linha X vs Y', 'Matriz de Correlação', 'Box Plot', 'Histograma', 'Covariância ao longo do tempo', 'ARIMA Decomposition']
 )
 
 # Função para plotar gráfico de linha
@@ -176,6 +178,30 @@ def plot_time_covariance():
     fig_cov = px.scatter(cov_df, x='timestamp', y=cov_df.columns[:-1], title="Covariância ao longo do tempo")
 
     st.plotly_chart(fig_cov)
+
+# Função para decompor a série temporal usando ARIMA
+def plot_arima_decomposition():
+    if len(selected_columns) != 1:
+        st.warning("Selecione exatamente uma coluna para decompor a série temporal.")
+        return
+
+    column = selected_columns[0]
+    ts_data = filtered_df.set_index('timestamp')[column].dropna()
+    
+    # Ajustar o modelo ARIMA
+    model = ARIMA(ts_data, order=(1, 1, 1))
+    fitted_model = model.fit()
+    
+    # Decompor a série temporal
+    decomposition = seasonal_decompose(ts_data, model='additive', period=1)
+    
+    # Plotar a decomposição
+    fig = px.line()
+    fig.add_scatter(x=decomposition.trend.index, y=decomposition.trend, mode='lines', name='Trend')
+    fig.add_scatter(x=decomposition.seasonal.index, y=decomposition.seasonal, mode='lines', name='Seasonal')
+    fig.add_scatter(x=decomposition.resid.index, y=decomposition.resid, mode='lines', name='Residual')
+    
+    st.plotly_chart(fig)
 
 # Exibir o gráfico selecionado
 if selected_plot == 'Linha X vs Y':
