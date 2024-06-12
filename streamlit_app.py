@@ -191,7 +191,7 @@ def plot_arima_decomposition():
     ts_data = filtered_df.set_index('timestamp')[column].dropna()
 
     # Pedir ao usuário para inserir o período e ordens p, d, q do modelo ARIMA
-    period = st.number_input('Insira o período da série temporal:', min_value=1, max_value=len(ts_data), value=max(12, min(len(ts_data) // 2, 365)))
+    period = st.number_input('Insira o período da série temporal:', min_value=1, max_value=len(ts_data), value=max(12, min(len(ts_data) // 2, 2016)))
     p = st.number_input('Ordem do componente autoregressivo (p):', min_value=0, max_value=10, value=1)
     d = st.number_input('Ordem de diferenciação (d):', min_value=0, max_value=5, value=1)
     q = st.number_input('Ordem da média móvel (q):', min_value=0, max_value=10, value=1)
