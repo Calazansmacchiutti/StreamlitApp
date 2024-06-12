@@ -187,20 +187,28 @@ def plot_arima_decomposition():
 
     column = selected_columns[0]
     ts_data = filtered_df.set_index('timestamp')[column].dropna()
-    
+
+    # Pedir ao usuário para inserir o período se não souber
+    period = st.number_input('Insira o período da série temporal:', min_value=1, max_value=len(ts_data), value=max(12, min(len(ts_data) // 2, 365)))
+
     # Ajustar o modelo ARIMA
     model = ARIMA(ts_data, order=(1, 1, 1))
     fitted_model = model.fit()
-    
+
     # Decompor a série temporal
-    decomposition = seasonal_decompose(ts_data, model='additive', period=1)
-    
-    # Plotar a decomposição
-    fig = px.line()
-    fig.add_scatter(x=decomposition.trend.index, y=decomposition.trend, mode='lines', name='Trend')
-    fig.add_scatter(x=decomposition.seasonal.index, y=decomposition.seasonal, mode='lines', name='Seasonal')
-    fig.add_scatter(x=decomposition.resid.index, y=decomposition.resid, mode='lines', name='Residual')
-    
+    decomposition = seasonal_decompose(ts_data, model='additive', period=period)
+
+    # Criação de subplots para cada componente da decomposição
+    fig = make_subplots(rows=4, cols=1, shared_xaxes=True, 
+                        subplot_titles=("Original", "Trend", "Seasonal", "Residual"))
+
+    fig.add_trace(go.Scatter(x=ts_data.index, y=ts_data, mode='lines', name='Original'), row=1, col=1)
+    fig.add_trace(go.Scatter(x=decomposition.trend.index, y=decomposition.trend, mode='lines', name='Trend'), row=2, col=1)
+    fig.add_trace(go.Scatter(x=decomposition.seasonal.index, y=decomposition.seasonal, mode='lines', name='Seasonal'), row=3, col=1)
+    fig.add_trace(go.Scatter(x=decomposition.resid.index, y=decomposition.resid, mode='lines', name='Residual'), row=4, col=1)
+
+    fig.update_layout(height=800, title_text="ARIMA Decomposition")
+
     st.plotly_chart(fig)
 
 # Exibir o gráfico selecionado
@@ -214,5 +222,5 @@ elif selected_plot == 'Histograma':
     plot_histogram()
 elif selected_plot == 'Covariância ao longo do tempo':
     plot_time_covariance()
-elif selected_plot == 'ARIMA decomposition':
-    plot_arima_decomposition()    
+elif selected_plot == 'ARIMA Decomposition':
+    plot_arima_decomposition()   
