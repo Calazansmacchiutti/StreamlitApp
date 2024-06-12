@@ -214,5 +214,5 @@ elif selected_plot == 'Histograma':
     plot_histogram()
 elif selected_plot == 'Covariância ao longo do tempo':
     plot_time_covariance()
-elif selected_plot == 'Decomposição de série temporal':
+elif selected_plot == 'ARIMA decomposition':
     plot_arima_decomposition()    
