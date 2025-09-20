@@ -1,0 +1,940 @@
+# Configuração Avançada do Sistema de Monitoramento de Estações de Tratamento
+
+# Estações de Tratamento com Metadados Completos
+stations:
+  Two Mouths:
+    type: primary
+    capacity: 10000  # m³/dia
+    location:
+      latitude: -23.5505
+      longitude: -46.6333
+      address: "Rua das Águas, 123 - São Paulo, SP"
+      timezone: "America/Sao_Paulo"
+    parameters:
+      - pH
+      - turbidity
+      - chlorine
+      - flow_rate
+      - temperature
+      - dissolved_oxygen
+      - conductivity
+      - alkalinity
+      - hardness
+    sensors:
+      pH:
+        model: "PHE-45P"
+        manufacturer: "Hach"
+        serial_number: "PHE-45P-001"
+        installation_date: "2023-01-15"
+        calibration_interval: 7  # dias
+        last_calibration: "2024-01-15"
+        next_calibration: "2024-01-22"
+        accuracy: "±0.1 pH"
+        range: "0-14 pH"
+        status: "operational"
+      turbidity:
+        model: "TUR-2000"
+        manufacturer: "Hach"
+        serial_number: "TUR-2000-001"
+        installation_date: "2023-01-15"
+        calibration_interval: 30
+        last_calibration: "2024-01-01"
+        next_calibration: "2024-01-31"
+        accuracy: "±0.1 NTU"
+        range: "0-4000 NTU"
+        status: "operational"
+      chlorine:
+        model: "CL-17"
+        manufacturer: "Hach"
+        serial_number: "CL-17-001"
+        installation_date: "2023-01-15"
+        calibration_interval: 14
+        last_calibration: "2024-01-10"
+        next_calibration: "2024-01-24"
+        accuracy: "±0.01 mg/L"
+        range: "0-20 mg/L"
+        status: "operational"
+    maintenance:
+      next_inspection: "2024-02-15"
+      last_inspection: "2024-01-15"
+      status: "operational"
+      maintenance_team: "Team Alpha"
+      contact: "+55 11 99999-9999"
+        
+  New Rose of Rocky:
+    type: secondary
+    capacity: 8000
+    location:
+      latitude: -23.5605
+      longitude: -46.6433
+      address: "Av. Rocky, 456 - São Paulo, SP"
+      timezone: "America/Sao_Paulo"
+    parameters:
+      - pH
+      - dissolved_oxygen
+      - BOD
+      - COD
+      - TSS
+      - nitrogen_total
+      - phosphorus_total
+      - ammonia
+      - nitrate
+    sensors:
+      dissolved_oxygen:
+        model: "LDO-101"
+        manufacturer: "Hach"
+        serial_number: "LDO-101-001"
+        installation_date: "2023-02-01"
+        calibration_interval: 14
+        last_calibration: "2024-01-12"
+        next_calibration: "2024-01-26"
+        accuracy: "±0.1 mg/L"
+        range: "0-20 mg/L"
+        status: "operational"
+    maintenance:
+      next_inspection: "2024-02-20"
+      last_inspection: "2024-01-20"
+      status: "operational"
+      maintenance_team: "Team Beta"
+      contact: "+55 11 88888-8888"
+      
+  Botanic Garden:
+    type: tertiary
+    capacity: 5000
+    location:
+      latitude: -23.5705
+      longitude: -46.6533
+      address: "Jardim Botânico, 789 - São Paulo, SP"
+      timezone: "America/Sao_Paulo"
+    parameters:
+      - pH
+      - nitrogen
+      - phosphorus
+      - coliform
+      - turbidity
+      - UV_transmittance
+      - residual_chlorine
+    sensors:
+      coliform:
+        model: "Colilert-18"
+        manufacturer: "IDEXX"
+        serial_number: "COL-18-001"
+        installation_date: "2023-03-01"
+        calibration_interval: 30
+        last_calibration: "2024-01-05"
+        next_calibration: "2024-02-04"
+        accuracy: "MPN method"
+        range: "1-2000 MPN/100mL"
+        status: "operational"
+    maintenance:
+      next_inspection: "2024-02-25"
+      last_inspection: "2024-01-25"
+      status: "operational"
+      maintenance_team: "Team Gamma"
+      contact: "+55 11 77777-7777"
+
+# Limites Operacionais Avançados
+thresholds:
+  pH:
+    min: 6.5
+    max: 8.5
+    critical_min: 6.0
+    critical_max: 9.0
+    unit: "-"
+    target: 7.0
+    tolerance: 0.5
+    description: "Medida de acidez/alcalinidade"
+    regulatory_limit: true
+    enforcement_level: "mandatory"
+    
+  turbidity:
+    max: 5.0
+    critical_max: 10.0
+    unit: "NTU"
+    target: 1.0
+    tolerance: 2.0
+    description: "Medida de clareza da água"
+    regulatory_limit: true
+    enforcement_level: "mandatory"
+    
+  chlorine:
+    min: 0.5
+    max: 2.0
+    critical_min: 0.3
+    critical_max: 3.0
+    unit: "mg/L"
+    target: 1.0
+    tolerance: 0.5
+    description: "Concentração de cloro residual"
+    regulatory_limit: true
+    enforcement_level: "mandatory"
+    
+  temperature:
+    min: 15
+    max: 30
+    critical_min: 10
+    critical_max: 35
+    unit: "°C"
+    target: 22
+    tolerance: 5
+    description: "Temperatura da água"
+    regulatory_limit: false
+    enforcement_level: "advisory"
+    
+  dissolved_oxygen:
+    min: 5.0
+    critical_min: 3.0
+    unit: "mg/L"
+    target: 7.0
+    tolerance: 2.0
+    description: "Oxigênio dissolvido"
+    regulatory_limit: true
+    enforcement_level: "mandatory"
+    
+  BOD:
+    max: 30
+    critical_max: 50
+    unit: "mg/L"
+    target: 15
+    tolerance: 10
+    description: "Demanda bioquímica de oxigênio"
+    regulatory_limit: true
+    enforcement_level: "mandatory"
+    
+  COD:
+    max: 100
+    critical_max: 150
+    unit: "mg/L"
+    target: 50
+    tolerance: 25
+    description: "Demanda química de oxigênio"
+    regulatory_limit: true
+    enforcement_level: "mandatory"
+    
+  TSS:
+    max: 30
+    critical_max: 50
+    unit: "mg/L"
+    target: 10
+    tolerance: 15
+    description: "Sólidos suspensos totais"
+    regulatory_limit: true
+    enforcement_level: "mandatory"
+    
+  coliform:
+    max: 1000
+    critical_max: 10000
+    unit: "CFU/100mL"
+    target: 100
+    tolerance: 500
+    description: "Coliformes totais"
+    regulatory_limit: true
+    enforcement_level: "mandatory"
+
+# Configurações do Sistema Avançadas
+system:
+  update_interval: 300  # segundos
+  data_retention_days: 90
+  backup_interval: 86400  # 1 dia em segundos
+  log_level: "INFO"
+  timezone: "America/Sao_Paulo"
+  language: "pt_BR"
+  
+  # Performance
+  cache_size: 1000  # MB
+  max_concurrent_requests: 10
+  request_timeout: 30  # segundos
+  enable_compression: true
+  compression_level: 6
+  
+  # Segurança
+  enable_authentication: true
+  session_timeout: 3600  # segundos
+  max_login_attempts: 5
+  password_policy:
+    min_length: 8
+    require_uppercase: true
+    require_lowercase: true
+    require_numbers: true
+    require_special_chars: true
+    max_age_days: 90
+  
+  # Backup
+  backup_location: "./backups"
+  backup_retention_days: 30
+  enable_cloud_backup: false
+  cloud_provider: "aws_s3"  # aws_s3, azure_blob, gcp_storage
+  encryption_enabled: true
+  
+  # Monitoramento
+  health_check_interval: 60  # segundos
+  performance_monitoring: true
+  error_tracking: true
+  metrics_collection: true
+
+# Alertas e Notificações Avançados
+alerts:
+  email:
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    use_tls: true
+    use_ssl: false
+    sender: "sistema.monitoramento@estacao.com"
+    sender_name: "Sistema de Monitoramento"
+    username: "your-email@gmail.com"
+    password: "your-app-password"
+    recipients:
+      - "operador@estacao.com"
+      - "supervisor@estacao.com"
+      - "gerente@estacao.com"
+    templates:
+      critical: "templates/email_critical.html"
+      warning: "templates/email_warning.html"
+      info: "templates/email_info.html"
+    rate_limiting:
+      max_emails_per_hour: 50
+      max_emails_per_day: 200
+      
+  sms:
+    provider: "twilio"  # twilio, aws_sns, azure_communication
+    api_key: "your-api-key"
+    api_secret: "your-api-secret"
+    from_number: "+1234567890"
+    numbers:
+      - "+5511999999999"
+      - "+5511888888888"
+    templates:
+      critical: "ALERTA CRÍTICO: {parameter} = {value} {unit} em {station}"
+      warning: "AVISO: {parameter} = {value} {unit} em {station}"
+    rate_limiting:
+      max_sms_per_hour: 20
+      max_sms_per_day: 100
+      
+  slack:
+    webhook_url: "https://hooks.slack.com/services/..."
+    channel: "#water-treatment-alerts"
+    username: "WaterBot"
+    icon_emoji: ":droplet:"
+    thread_replies: true
+    
+  teams:
+    webhook_url: "https://outlook.office.com/webhook/..."
+    title: "Alerta do Sistema de Monitoramento"
+    theme_color: "FF0000"
+    
+  webhook:
+    url: "https://your-api.com/alerts"
+    method: "POST"
+    headers:
+      Authorization: "Bearer your-token"
+      Content-Type: "application/json"
+    timeout: 10
+    retry_attempts: 3
+    
+  escalation:
+    - level: "low"
+      delay: 3600  # 1 hora
+      notify: ["email"]
+      auto_resolve: true
+      escalation_after: 7200  # 2 horas
+    - level: "medium"
+      delay: 1800  # 30 minutos
+      notify: ["email", "slack"]
+      auto_resolve: false
+      escalation_after: 3600  # 1 hora
+    - level: "high"
+      delay: 300  # 5 minutos
+      notify: ["email", "slack", "sms"]
+      auto_resolve: false
+      escalation_after: 900  # 15 minutos
+    - level: "critical"
+      delay: 0  # imediato
+      notify: ["email", "slack", "sms", "teams", "webhook"]
+      auto_resolve: false
+      escalation_after: 300  # 5 minutos
+
+# Modelos de Machine Learning Avançados
+models:
+  arima:
+    auto_select: true
+    max_p: 5
+    max_q: 5
+    seasonal: true
+    seasonal_period: 96  # 24 horas em dados de 15 min
+    information_criterion: "aic"
+    stepwise: true
+    approximation: false
+    n_jobs: -1
+    
+  sarima:
+    auto_select: true
+    max_p: 3
+    max_q: 3
+    max_P: 2
+    max_Q: 2
+    seasonal_period: 96
+    information_criterion: "aic"
+    stepwise: true
+    
+  prophet:
+    changepoint_prior_scale: 0.05
+    seasonality_prior_scale: 10.0
+    holidays_prior_scale: 10.0
+    seasonality_mode: "multiplicative"
+    daily_seasonality: true
+    weekly_seasonality: true
+    yearly_seasonality: false
+    interval_width: 0.95
+    mcmc_samples: 0
+    uncertainty_samples: 1000
+    
+  lstm:
+    sequence_length: 24
+    hidden_units: 64
+    num_layers: 2
+    dropout: 0.2
+    recurrent_dropout: 0.2
+    epochs: 100
+    batch_size: 32
+    learning_rate: 0.001
+    early_stopping_patience: 10
+    validation_split: 0.2
+    optimizer: "adam"
+    loss: "mse"
+    metrics: ["mae", "rmse"]
+    
+  random_forest:
+    n_estimators: 100
+    max_depth: 10
+    min_samples_split: 5
+    min_samples_leaf: 2
+    max_features: "sqrt"
+    bootstrap: true
+    random_state: 42
+    n_jobs: -1
+    warm_start: false
+    
+  xgboost:
+    n_estimators: 100
+    max_depth: 6
+    learning_rate: 0.1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    colsample_bylevel: 1.0
+    colsample_bynode: 1.0
+    reg_alpha: 0
+    reg_lambda: 1
+    random_state: 42
+    n_jobs: -1
+    
+  ensemble:
+    methods: ["arima", "prophet", "random_forest", "xgboost"]
+    weights: [0.2, 0.3, 0.25, 0.25]
+    voting: "weighted"
+    meta_learner: "linear_regression"
+    cross_validation: true
+    cv_folds: 5
+    
+  anomaly_detection:
+    isolation_forest:
+      contamination: 0.1
+      n_estimators: 100
+      max_samples: "auto"
+      max_features: 1.0
+      bootstrap: false
+      random_state: 42
+      n_jobs: -1
+    one_class_svm:
+      nu: 0.1
+      kernel: "rbf"
+      gamma: "auto"
+      degree: 3
+      coef0: 0.0
+      shrinking: true
+      cache_size: 200
+    dbscan:
+      eps: 0.5
+      min_samples: 5
+      metric: "euclidean"
+      algorithm: "auto"
+      leaf_size: 30
+      n_jobs: -1
+    statistical:
+      zscore_threshold: 3.0
+      iqr_multiplier: 1.5
+      mad_threshold: 3.5
+      modified_zscore: true
+    lstm_autoencoder:
+      sequence_length: 24
+      encoding_dim: 8
+      hidden_units: 32
+      dropout: 0.2
+      epochs: 50
+      batch_size: 32
+      reconstruction_threshold: 0.95
+
+# Relatórios Avançados
+reports:
+  templates:
+    operational:
+      name: "Relatório Operacional"
+      sections: ["summary", "kpis", "trends", "alerts", "equipment_status"]
+      format: ["pdf", "excel", "html"]
+      language: "pt"
+      include_charts: true
+      chart_types: ["line", "bar", "scatter", "heatmap"]
+    compliance:
+      name: "Relatório de Conformidade"
+      sections: ["compliance_rate", "violations", "trends", "recommendations", "regulatory_summary"]
+      format: ["pdf", "excel"]
+      language: "pt"
+      include_charts: true
+      chart_types: ["gauge", "bar", "pie"]
+    maintenance:
+      name: "Relatório de Manutenção"
+      sections: ["equipment_status", "calibration_due", "performance", "recommendations", "cost_analysis"]
+      format: ["pdf", "word"]
+      language: "pt"
+      include_charts: true
+      chart_types: ["gantt", "bar", "scatter"]
+    executive:
+      name: "Relatório Executivo"
+      sections: ["summary", "kpis", "costs", "recommendations", "strategic_insights"]
+      format: ["pdf", "powerpoint"]
+      language: "pt"
+      include_charts: true
+      chart_types: ["dashboard", "kpi_cards", "trend_lines"]
+    custom:
+      name: "Relatório Customizado"
+      sections: ["user_defined"]
+      format: ["pdf", "excel", "word", "html"]
+      language: "pt"
+      include_charts: true
+      chart_types: ["all"]
+    
+  schedule:
+    daily:
+      time: "06:00"
+      recipients: ["operador@estacao.com"]
+      template: "operational"
+      format: "pdf"
+      timezone: "America/Sao_Paulo"
+      
+    weekly:
+      day: "monday"
+      time: "08:00"
+      recipients: ["supervisor@estacao.com"]
+      template: "compliance"
+      format: "excel"
+      timezone: "America/Sao_Paulo"
+      
+    monthly:
+      day: 1
+      time: "09:00"
+      recipients: ["gerente@estacao.com"]
+      template: "executive"
+      format: "pdf"
+      timezone: "America/Sao_Paulo"
+      
+    quarterly:
+      day: 1
+      months: [1, 4, 7, 10]
+      time: "10:00"
+      recipients: ["diretor@estacao.com"]
+      template: "executive"
+      format: "powerpoint"
+      timezone: "America/Sao_Paulo"
+      
+  generation:
+    max_concurrent_reports: 3
+    timeout: 300  # segundos
+    retry_attempts: 3
+    enable_compression: true
+    include_metadata: true
+    watermark: "CONFIDENCIAL"
+
+# Manutenção Preventiva Avançada
+maintenance:
+  preventive:
+    schedule:
+      - equipment: "Bomba Principal"
+        equipment_id: "PUMP-001"
+        interval_days: 30
+        last_maintenance: "2024-01-15"
+        next_maintenance: "2024-02-14"
+        status: "scheduled"
+        priority: "high"
+        estimated_duration: 4  # horas
+        required_skills: ["mecânico", "eletricista"]
+        parts_required: ["filtro", "óleo", "vedação"]
+        cost_estimate: 500.00
+        maintenance_type: "preventive"
+      - equipment: "Filtros"
+        equipment_id: "FILTER-001"
+        interval_days: 7
+        last_maintenance: "2024-01-20"
+        next_maintenance: "2024-01-27"
+        status: "due"
+        priority: "medium"
+        estimated_duration: 2
+        required_skills: ["operador"]
+        parts_required: ["areia", "antracito"]
+        cost_estimate: 200.00
+        maintenance_type: "cleaning"
+      - equipment: "Sensores pH"
+        equipment_id: "SENSOR-PH-001"
+        interval_days: 7
+        last_maintenance: "2024-01-18"
+        next_maintenance: "2024-01-25"
+        status: "scheduled"
+        priority: "high"
+        estimated_duration: 1
+        required_skills: ["técnico_instrumentação"]
+        parts_required: ["solução_buffer"]
+        cost_estimate: 50.00
+        maintenance_type: "calibration"
+      - equipment: "Sistema de Cloração"
+        equipment_id: "CHLOR-001"
+        interval_days: 14
+        last_maintenance: "2024-01-10"
+        next_maintenance: "2024-01-24"
+        status: "scheduled"
+        priority: "high"
+        estimated_duration: 3
+        required_skills: ["químico", "técnico_instrumentação"]
+        parts_required: ["cloro", "válvulas", "tubulações"]
+        cost_estimate: 300.00
+        maintenance_type: "preventive"
+        
+  calibration:
+    schedule:
+      - sensor: "pH"
+        sensor_id: "SENSOR-PH-001"
+        interval_days: 7
+        last_calibration: "2024-01-15"
+        next_calibration: "2024-01-22"
+        status: "scheduled"
+        method: "buffer_solution"
+        standards_used: ["pH 4.01", "pH 7.00", "pH 10.01"]
+        technician: "João Silva"
+        certificate_number: "CAL-2024-001"
+      - sensor: "Turbidez"
+        sensor_id: "SENSOR-TUR-001"
+        interval_days: 30
+        last_calibration: "2024-01-01"
+        next_calibration: "2024-01-31"
+        status: "scheduled"
+        method: "formazin_standard"
+        standards_used: ["0 NTU", "20 NTU", "100 NTU", "800 NTU"]
+        technician: "Maria Santos"
+        certificate_number: "CAL-2024-002"
+      - sensor: "Cloro"
+        sensor_id: "SENSOR-CL-001"
+        interval_days: 14
+        last_calibration: "2024-01-10"
+        next_calibration: "2024-01-24"
+        status: "scheduled"
+        method: "dilution_standard"
+        standards_used: ["0 mg/L", "0.5 mg/L", "1.0 mg/L", "2.0 mg/L"]
+        technician: "Pedro Costa"
+        certificate_number: "CAL-2024-003"
+      - sensor: "Oxigênio Dissolvido"
+        sensor_id: "SENSOR-DO-001"
+        interval_days: 14
+        last_calibration: "2024-01-12"
+        next_calibration: "2024-01-26"
+        status: "scheduled"
+        method: "zero_air_saturation"
+        standards_used: ["0% sat", "100% sat"]
+        technician: "Ana Oliveira"
+        certificate_number: "CAL-2024-004"
+
+# API e Integração Avançadas
+api:
+  enabled: true
+  port: 8000
+  host: "0.0.0.0"
+  version: "v1"
+  base_path: "/api/v1"
+  
+  authentication:
+    type: "jwt"  # jwt, api_key, oauth2
+    secret_key: "your-secret-key-change-this"
+    token_expiry: 3600  # segundos
+    refresh_token_expiry: 86400  # 24 horas
+    algorithm: "HS256"
+    
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 100
+    requests_per_hour: 1000
+    requests_per_day: 10000
+    burst_size: 20
+    storage: "memory"  # memory, redis
+    
+  cors:
+    enabled: true
+    origins: ["*"]  # Configure specific origins in production
+    methods: ["GET", "POST", "PUT", "DELETE"]
+    headers: ["Content-Type", "Authorization"]
+    
+  endpoints:
+    - path: "/data"
+      methods: ["GET", "POST"]
+      description: "Access to station data"
+      authentication_required: true
+    - path: "/alerts"
+      methods: ["GET", "POST", "PUT"]
+      description: "Alert management"
+      authentication_required: true
+    - path: "/reports"
+      methods: ["GET", "POST"]
+      description: "Report generation"
+      authentication_required: true
+    - path: "/health"
+      methods: ["GET"]
+      description: "System health check"
+      authentication_required: false
+    - path: "/metrics"
+      methods: ["GET"]
+      description: "System metrics"
+      authentication_required: true
+    - path: "/stations"
+      methods: ["GET", "POST", "PUT", "DELETE"]
+      description: "Station management"
+      authentication_required: true
+    - path: "/maintenance"
+      methods: ["GET", "POST", "PUT"]
+      description: "Maintenance scheduling"
+      authentication_required: true
+      
+  external_integrations:
+    scada:
+      enabled: false
+      protocol: "modbus"  # modbus, opc_ua, dnp3
+      host: "192.168.1.100"
+      port: 502
+      unit_id: 1
+      timeout: 5
+      retry_attempts: 3
+      data_mapping:
+        pH: "register_1001"
+        turbidity: "register_1002"
+        chlorine: "register_1003"
+        
+    historian:
+      enabled: false
+      type: "pi_system"  # pi_system, wonderware, osisoft
+      server: "pi-server.company.com"
+      port: 5450
+      username: "pi_user"
+      password: "pi_password"
+      database: "water_treatment"
+      
+    weather:
+      enabled: true
+      provider: "openweathermap"  # openweathermap, accuweather, weather_api
+      api_key: "your-weather-api-key"
+      update_interval: 3600  # segundos
+      parameters: ["temperature", "humidity", "pressure", "wind_speed", "precipitation"]
+      location:
+        latitude: -23.5505
+        longitude: -46.6333
+        
+    regulatory:
+      enabled: false
+      provider: "conama"  # conama, who, epa
+      api_endpoint: "https://api.conama.gov.br"
+      api_key: "your-regulatory-api-key"
+      update_interval: 86400  # 24 horas
+      standards: ["portaria_2914", "resolucao_357"]
+
+# Monitoramento e Métricas Avançadas
+monitoring:
+  metrics:
+    enabled: true
+    port: 9090
+    path: "/metrics"
+    collect_interval: 60  # segundos
+    storage: "prometheus"  # prometheus, influxdb, graphite
+    
+    custom_metrics:
+      - name: "water_quality_score"
+        type: "gauge"
+        description: "Overall water quality score"
+        labels: ["station", "parameter"]
+      - name: "anomaly_rate"
+        type: "gauge"
+        description: "Rate of detected anomalies"
+        labels: ["station", "method"]
+      - name: "compliance_rate"
+        type: "gauge"
+        description: "Regulatory compliance rate"
+        labels: ["station", "parameter"]
+      - name: "maintenance_due_count"
+        type: "gauge"
+        description: "Number of maintenance tasks due"
+        labels: ["station", "equipment_type"]
+        
+  health_checks:
+    enabled: true
+    interval: 30  # segundos
+    timeout: 10  # segundos
+    checks:
+      - name: "database_connection"
+        type: "database"
+        critical: true
+        query: "SELECT 1"
+        timeout: 5
+      - name: "sensor_data_freshness"
+        type: "data_age"
+        threshold: 300  # segundos
+        critical: true
+        parameter: "timestamp"
+      - name: "alert_system"
+        type: "service"
+        critical: false
+        endpoint: "/api/v1/health/alerts"
+      - name: "report_generation"
+        type: "service"
+        critical: false
+        endpoint: "/api/v1/health/reports"
+      - name: "external_api_connectivity"
+        type: "http"
+        critical: false
+        url: "https://api.openweathermap.org/data/2.5/weather"
+        timeout: 10
+        
+  logging:
+    level: "INFO"
+    format: "json"  # json, text, structured
+    file: "logs/system.log"
+    max_size: "100MB"
+    backup_count: 5
+    rotation: "daily"
+    compression: true
+    
+    structured_logging:
+      enabled: true
+      fields:
+        - "timestamp"
+        - "level"
+        - "message"
+        - "module"
+        - "function"
+        - "line_number"
+        - "user_id"
+        - "session_id"
+        - "request_id"
+        
+  performance:
+    enable_profiling: false
+    profile_interval: 300  # segundos
+    memory_monitoring: true
+    cpu_monitoring: true
+    disk_monitoring: true
+    network_monitoring: true
+    
+    profiling:
+      enabled: false
+      output_dir: "profiles"
+      include_children: true
+      sort_by: "cumulative"
+      
+    resource_limits:
+      max_memory_usage: "2GB"
+      max_cpu_usage: 80  # percent
+      max_disk_usage: "10GB"
+      alert_threshold: 90  # percent
+
+# Configurações de Interface Avançadas
+ui:
+  theme:
+    primary_color: "#1e3d59"
+    secondary_color: "#667eea"
+    background_color: "#f8f9fa"
+    text_color: "#333333"
+    accent_color: "#28a745"
+    warning_color: "#ffc107"
+    danger_color: "#dc3545"
+    info_color: "#17a2b8"
+    
+  dashboard:
+    default_refresh_interval: 30  # segundos
+    max_data_points: 1000
+    chart_height: 400
+    enable_animations: true
+    enable_zoom: true
+    enable_pan: true
+    show_grid: true
+    show_legend: true
+    
+    layout:
+      default_view: "overview"
+      sidebar_collapsed: false
+      show_breadcrumbs: true
+      show_page_title: true
+      
+    widgets:
+      kpi_cards:
+        enabled: true
+        animation: true
+        color_coding: true
+      charts:
+        enabled: true
+        types: ["line", "bar", "scatter", "heatmap", "gauge", "pie"]
+        interactive: true
+        exportable: true
+      tables:
+        enabled: true
+        sortable: true
+        filterable: true
+        exportable: true
+        pagination: true
+        page_size: 50
+        
+  notifications:
+    show_toast: true
+    auto_hide: true
+    hide_delay: 5000  # milissegundos
+    position: "top-right"
+    max_notifications: 5
+    sound_enabled: false
+    
+    types:
+      success:
+        icon: "✅"
+        color: "#28a745"
+      warning:
+        icon: "⚠️"
+        color: "#ffc107"
+      error:
+        icon: "❌"
+        color: "#dc3545"
+      info:
+        icon: "ℹ️"
+        color: "#17a2b8"
+        
+  accessibility:
+    high_contrast: false
+    large_fonts: false
+    screen_reader_support: true
+    keyboard_navigation: true
+    focus_indicators: true
+    color_blind_friendly: false
+    
+  localization:
+    default_language: "pt_BR"
+    supported_languages: ["pt_BR", "en_US", "es_ES"]
+    date_format: "DD/MM/YYYY"
+    time_format: "24h"
+    number_format: "pt_BR"
+    currency: "BRL"
+    
+  user_preferences:
+    save_preferences: true
+    default_time_range: "24h"
+    default_chart_type: "line"
+    auto_refresh: true
+    dark_mode: false
+    compact_mode: false

@@ -1,7 +1,73 @@
-streamlit-nightly
-pandas
-plotly
-numpy
-scipy
-pathlib
-statsmodels
+# Core dependencies
+streamlit>=1.28.0
+pandas>=2.0.0
+numpy>=1.24.0
+plotly>=5.17.0
+
+# Data analysis and statistics
+scipy>=1.11.0
+statsmodels>=0.14.0
+
+# Machine learning
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+
+# Time series analysis
+prophet>=1.1.5
+pmdarima>=2.0.0  # Auto ARIMA
+
+# Anomaly detection
+pyod>=1.1.0
+
+# Data visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Configuration and utilities
+PyYAML>=6.0
+python-dateutil>=2.8.0
+pytz>=2023.3
+
+# Email and notifications
+requests>=2.31.0
+
+# File handling
+openpyxl>=3.1.0
+xlsxwriter>=3.1.0
+reportlab>=4.0.0  # PDF generation
+python-docx>=1.0.0  # Word documents
+
+# Database support
+sqlite3  # Built-in with Python
+
+# Performance and caching
+joblib>=1.3.0
+memory-profiler>=0.60.0
+
+# Advanced analytics
+scikit-optimize>=0.9.0  # Hyperparameter optimization
+optuna>=3.0.0  # Advanced optimization
+
+# Deep learning (optional)
+# tensorflow>=2.13.0  # For LSTM models
+# torch>=2.0.0        # For PyTorch models
+# keras>=2.13.0       # High-level neural networks
+
+# Development and testing
+# pytest>=7.0.0       # Testing framework
+# black>=23.0.0       # Code formatting
+# flake8>=6.0.0       # Linting
+# mypy>=1.0.0         # Type checking
+
+# Jupyter support (optional)
+# jupyter>=1.0.0      # For notebook support
+# ipywidgets>=8.0.0   # For interactive widgets
+
+# API and web services
+# fastapi>=0.100.0    # For REST API
+# uvicorn>=0.20.0     # ASGI server
+# pydantic>=2.0.0     # Data validation
+
+# Monitoring and logging
+# prometheus-client>=0.17.0  # Metrics
+# structlog>=23.0.0          # Structured logging

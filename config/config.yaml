@@ -1,0 +1,267 @@
+# Configurações do Sistema de Monitoramento de Estações de Tratamento
+
+# Configurações das estações
+stations:
+  "Two Mouths":
+    type: "primary"
+    capacity: 10000  # m³/dia
+    location: "Rio de Janeiro, RJ"
+    parameters:
+      - "pH"
+      - "turbidity"
+      - "chlorine"
+      - "flow_rate"
+      - "temperature"
+    description: "Estação principal de tratamento de água"
+    
+  "New Rose of Rocky":
+    type: "secondary"
+    capacity: 8000  # m³/dia
+    location: "São Paulo, SP"
+    parameters:
+      - "pH"
+      - "DO"
+      - "BOD"
+      - "COD"
+      - "TSS"
+    description: "Estação secundária com foco em tratamento biológico"
+    
+  "Botanic Garden":
+    type: "tertiary"
+    capacity: 5000  # m³/dia
+    location: "Brasília, DF"
+    parameters:
+      - "pH"
+      - "nitrogen"
+      - "phosphorus"
+      - "coliform"
+      - "turbidity"
+    description: "Estação terciária com tratamento avançado"
+
+# Limites de controle por parâmetro
+thresholds:
+  pH:
+    min: 6.5
+    max: 8.5
+    critical_min: 6.0
+    critical_max: 9.0
+    unit: "pH units"
+    description: "Medida de acidez/alcalinidade"
+    
+  turbidity:
+    max: 5.0
+    critical_max: 10.0
+    unit: "NTU"
+    description: "Medida de clareza da água"
+    
+  chlorine:
+    min: 0.5
+    max: 2.0
+    critical_min: 0.3
+    critical_max: 3.0
+    unit: "mg/L"
+    description: "Concentração de cloro residual"
+    
+  temperature:
+    min: 15
+    max: 30
+    critical_min: 10
+    critical_max: 35
+    unit: "°C"
+    description: "Temperatura da água"
+    
+  flow_rate:
+    min: 500
+    max: 1500
+    critical_min: 300
+    critical_max: 2000
+    unit: "m³/h"
+    description: "Taxa de fluxo de água"
+    
+  DO:  # Dissolved Oxygen
+    min: 5.0
+    critical_min: 3.0
+    unit: "mg/L"
+    description: "Oxigênio dissolvido"
+    
+  BOD:  # Biochemical Oxygen Demand
+    max: 30
+    critical_max: 50
+    unit: "mg/L"
+    description: "Demanda bioquímica de oxigênio"
+    
+  COD:  # Chemical Oxygen Demand
+    max: 100
+    critical_max: 150
+    unit: "mg/L"
+    description: "Demanda química de oxigênio"
+    
+  TSS:  # Total Suspended Solids
+    max: 50
+    critical_max: 100
+    unit: "mg/L"
+    description: "Sólidos suspensos totais"
+    
+  nitrogen:
+    max: 10
+    critical_max: 20
+    unit: "mg/L"
+    description: "Concentração de nitrogênio"
+    
+  phosphorus:
+    max: 2
+    critical_max: 5
+    unit: "mg/L"
+    description: "Concentração de fósforo"
+    
+  coliform:
+    max: 100
+    critical_max: 1000
+    unit: "CFU/100mL"
+    description: "Coliformes totais"
+
+# Configurações do sistema
+system:
+  update_interval: 300  # segundos
+  data_retention_days: 90
+  max_anomaly_rate: 0.1  # 10% máximo de anomalias
+  auto_refresh: true
+  timezone: "America/Sao_Paulo"
+
+# Configurações de detecção de anomalias
+anomaly_detection:
+  methods:
+    - "isolation_forest"
+    - "one_class_svm"
+    - "dbscan"
+    - "iqr"
+    - "zscore"
+  default_method: "isolation_forest"
+  contamination: 0.1
+  sensitivity: 0.5
+  ensemble_voting_threshold: 0.5
+
+# Configurações de previsões
+forecasting:
+  models:
+    - "prophet"
+    - "arima"
+    - "random_forest"
+    - "xgboost"
+    - "lstm"
+  default_model: "prophet"
+  forecast_horizon_hours: 24
+  confidence_level: 0.95
+  cross_validation_splits: 5
+
+# Configurações de alertas
+alerts:
+  enabled: true
+  min_severity: "medium"
+  notification_methods:
+    email:
+      enabled: false
+      smtp:
+        host: "smtp.gmail.com"
+        port: 587
+        username: "your_email@gmail.com"
+        password: "your_password"
+        sender: "alerts@watertreatment.com"
+      recipients:
+        - "operator@watertreatment.com"
+        - "supervisor@watertreatment.com"
+    
+    slack:
+      enabled: false
+      webhook_url: "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+      channel: "#water-treatment-alerts"
+    
+    teams:
+      enabled: false
+      webhook_url: "https://your-org.webhook.office.com/webhookb2/YOUR/WEBHOOK"
+    
+    webhook:
+      enabled: false
+      url: "https://your-api.com/alerts"
+      headers:
+        Authorization: "Bearer your-token"
+  
+  rules:
+    threshold_exceeded:
+      enabled: true
+      severity: "high"
+    
+    anomaly_detected:
+      enabled: true
+      severity: "medium"
+      consecutive_anomalies: 2
+    
+    trend_anomaly:
+      enabled: true
+      severity: "medium"
+      trend_window: 24
+    
+    sensor_failure:
+      enabled: true
+      severity: "high"
+      max_missing_minutes: 60
+
+# Configurações de visualização
+visualization:
+  default_time_range: "24h"  # 1h, 6h, 24h, 7d, 30d
+  chart_height: 400
+  color_theme: "plotly"
+  show_confidence_intervals: true
+  show_trend_lines: true
+  show_anomaly_markers: true
+
+# Configurações de relatórios
+reports:
+  formats:
+    - "pdf"
+    - "excel"
+    - "html"
+  default_format: "pdf"
+  languages:
+    - "pt"
+    - "en"
+    - "es"
+  default_language: "pt"
+  include_charts: true
+  include_statistics: true
+  include_anomalies: true
+  include_predictions: false
+  include_recommendations: true
+
+# Configurações de dados
+data:
+  sampling_frequency: "15T"  # 15 minutos
+  missing_data_tolerance: 0.05  # 5% máximo de dados faltantes
+  outlier_detection: true
+  data_validation: true
+  backup_enabled: true
+  backup_frequency: "daily"
+
+# Configurações de segurança
+security:
+  authentication_required: false
+  session_timeout: 3600  # segundos
+  max_login_attempts: 3
+  password_min_length: 8
+  enable_audit_log: true
+
+# Configurações de performance
+performance:
+  max_data_points: 10000
+  enable_caching: true
+  cache_ttl: 300  # segundos
+  parallel_processing: true
+  max_workers: 4
+
+# Configurações de desenvolvimento
+development:
+  debug_mode: false
+  log_level: "INFO"
+  enable_profiling: false
+  mock_data: false
+  test_mode: false
