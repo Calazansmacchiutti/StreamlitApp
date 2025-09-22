@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tasklist)",
+      "Bash(findstr:*)",
+      "Bash(netstat:*)",
+      "Bash(dir data)",
+      "Bash(taskkill:*)",
+      "Bash(streamlit run:*)",
+      "Bash(python test:*)",
+      "Bash(del test_localization.py)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

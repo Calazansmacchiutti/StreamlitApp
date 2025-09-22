@@ -1,0 +1,270 @@
+# Configuração de Localização / Localization Configuration
+
+pt:
+  # Geral
+  app_title: "Sistema de Monitoramento de Estações de Tratamento"
+  welcome: "Bem-vindo ao Sistema de Monitoramento"
+  language: "Idioma"
+
+  # Menu/Páginas
+  overview: "Visão Geral"
+  time_series: "Séries Temporais"
+  predictions: "Previsões"
+  anomalies: "Anomalias"
+  reports: "Relatórios"
+  settings: "Configurações"
+
+  # Sidebar
+  station_selection: "Seleção de Estação"
+  select_station: "Selecionar Estação"
+  parameters: "Parâmetros"
+  select_parameters: "Selecionar parâmetros:"
+  auto_update: "Atualização Automática"
+  update_interval: "Intervalo de atualização (segundos):"
+  date_range: "Período de Análise"
+
+  # Dashboard
+  station_status: "Status da Estação"
+  active: "Ativa"
+  inactive: "Inativa"
+  last_update: "Última atualização:"
+  total_records: "Total de registros:"
+  data_quality: "Qualidade dos dados:"
+
+  # Análise
+  statistical_summary: "Resumo Estatístico"
+  mean: "Média"
+  std: "Desvio Padrão"
+  min: "Mínimo"
+  max: "Máximo"
+  correlation_matrix: "Matriz de Correlação"
+
+  # Previsões
+  prediction_model: "Modelo de Previsão"
+  horizon: "Horizonte"
+  confidence: "Confiança"
+  historical_data: "Dados Históricos"
+  forecast_results: "Resultados da Previsão"
+
+  # Anomalias
+  anomaly_detection: "Detecção de Anomalias"
+  detection_method: "Método de Detecção"
+  sensitivity: "Sensibilidade"
+  anomalies_found: "Anomalias Encontradas"
+  severity: "Severidade"
+  critical: "Crítico"
+  high: "Alto"
+  medium: "Médio"
+  low: "Baixo"
+
+  # Relatórios
+  report_type: "Tipo de Relatório"
+  operational: "Operacional"
+  executive: "Executivo"
+  compliance: "Conformidade"
+  maintenance: "Manutenção"
+  export_format: "Formato de Exportação"
+  generate_report: "Gerar Relatório"
+
+  # Erros e Mensagens
+  no_data: "Nenhum dado disponível"
+  loading: "Carregando..."
+  error: "Erro"
+  success: "Sucesso"
+  warning: "Aviso"
+  select_parameters_msg: "Por favor, selecione pelo menos um parâmetro."
+  model_not_available: "Modelo não disponível"
+
+en:
+  # General
+  app_title: "Water Treatment Station Monitoring System"
+  welcome: "Welcome to Monitoring System"
+  language: "Language"
+
+  # Menu/Pages
+  overview: "Overview"
+  time_series: "Time Series"
+  predictions: "Predictions"
+  anomalies: "Anomalies"
+  reports: "Reports"
+  settings: "Settings"
+  detailed_analysis: "Detailed Analysis"
+
+  # Additional UI elements
+  station: "Station"
+  parameter: "Parameter"
+  value: "Value"
+  timestamp: "Timestamp"
+  status: "Status"
+  alerts: "Alerts"
+
+  # Sidebar
+  station_selection: "Station Selection"
+  select_station: "Select Station"
+  parameters: "Parameters"
+  select_parameters: "Select parameters:"
+  auto_update: "Auto Update"
+  update_interval: "Update interval (seconds):"
+  date_range: "Analysis Period"
+
+  # Dashboard
+  station_status: "Station Status"
+  active: "Active"
+  inactive: "Inactive"
+  last_update: "Last update:"
+  total_records: "Total records:"
+  data_quality: "Data quality:"
+
+  # Analysis
+  statistical_summary: "Statistical Summary"
+  mean: "Mean"
+  std: "Standard Deviation"
+  min: "Minimum"
+  max: "Maximum"
+  correlation_matrix: "Correlation Matrix"
+
+  # Predictions
+  prediction_model: "Prediction Model"
+  horizon: "Horizon"
+  confidence: "Confidence"
+  historical_data: "Historical Data"
+  forecast_results: "Forecast Results"
+
+  # Anomalies
+  anomaly_detection: "Anomaly Detection"
+  detection_method: "Detection Method"
+  sensitivity: "Sensitivity"
+  anomalies_found: "Anomalies Found"
+  severity: "Severity"
+  critical: "Critical"
+  high: "High"
+  medium: "Medium"
+  low: "Low"
+
+  # Reports
+  report_type: "Report Type"
+  operational: "Operational"
+  executive: "Executive"
+  compliance: "Compliance"
+  maintenance: "Maintenance"
+  export_format: "Export Format"
+  generate_report: "Generate Report"
+
+  # Errors and Messages
+  no_data: "No data available"
+  loading: "Loading..."
+  error: "Error"
+  success: "Success"
+  warning: "Warning"
+  select_parameters_msg: "Please select at least one parameter."
+  model_not_available: "Model not available"
+
+  # Analysis types
+  seasonal_decomposition: "Seasonal Decomposition"
+  trend_analysis: "Trend Analysis"
+  distribution_analysis: "Distribution Analysis"
+  statistical_analysis: "Statistical Analysis"
+  descriptive_statistics: "Descriptive Statistics"
+
+  # Model types
+  random_forest: "Random Forest"
+  trend_analysis: "Trend Analysis"
+
+  # UI Labels
+  select_period: "Select period:"
+  select_analysis_type: "Select analysis type:"
+  select_parameter: "Select parameter:"
+  select_prediction_model: "Select prediction model:"
+
+  # Metrics and Status
+  active_stations: "Active Stations"
+  active_alerts: "Active Alerts"
+  last_update: "Last Update"
+  real_time: "Real Time"
+  critical_alerts: "critical"
+
+  # Time periods
+  last_hour: "Last Hour"
+  last_24_hours: "Last 24 Hours"
+  last_week: "Last Week"
+  last_month: "Last Month"
+  custom: "Custom"
+  start_time: "Start time"
+  end_time: "End time"
+
+  # Data and Parameters
+  average_ph: "Average pH"
+  average_turbidity: "Average Turbidity (NTU)"
+  current_flow: "Current Flow (m³/h)"
+  correlation_matrix: "Correlation Matrix"
+
+  # Analysis
+  seasonal_decomposition_metrics: "Decomposition Metrics"
+  trend_strength: "Trend Strength"
+  seasonal_strength: "Seasonal Strength"
+  residuals_variance: "Residuals Variance"
+  dominant_period: "Dominant Period"
+  obs: "obs"
+
+  # Forecasting
+  prediction_horizon_hours: "Prediction horizon (hours):"
+  confidence_level: "Confidence level (%):"
+  include_exogenous: "Include exogenous variables"
+  generate_predictions: "🚀 Generate Predictions"
+  historical_data: "Historical"
+  forecast: "Forecast"
+  linear_prediction: "Linear Prediction"
+
+  # Settings and Export
+  enable_auto_update: "Enable auto update"
+  update_interval_seconds: "Update interval (seconds):"
+  export_data: "💾 Export Data"
+
+  # Anomalies and Alerts
+  alerts_anomalies_system: "⚠️ Alerts and Anomaly Detection System"
+  detection_method: "Detection method:"
+  sensitivity_threshold: "Sensitivity threshold:"
+  auto_alerts: "Automatic alerts"
+  no_anomalies_detected: "✅ No anomalies detected in the selected period!"
+
+  # Reports
+  report_generation: "📑 Report Generation"
+  report_type: "Report type:"
+  operational_report: "Operational Report"
+  compliance_report: "Compliance Report"
+  maintenance_report: "Maintenance Report"
+  executive_report: "Executive Report"
+  report_start_date: "Report start date"
+  report_end_date: "Report end date"
+  report_options: "Report Options"
+  include_charts: "Include charts"
+  include_statistics: "Include statistics"
+  include_predictions: "Include predictions"
+  include_recommendations: "Include recommendations"
+  include_raw_data: "Include raw data"
+  report_language: "Language:"
+  generate_report: "📄 Generate Report"
+  generating_report: "Generating report..."
+  report_preview: "📋 Report Preview"
+  report_generated_success: "✅ Report generated successfully!"
+  download_report: "⬇️ Download Report"
+
+  # Statistics
+  mean: "Mean"
+  std_dev: "Standard Deviation"
+  normal_distribution: "Normal Distribution"
+  non_normal_distribution: "Non-Normal Distribution"
+
+  # Errors
+  station_not_valid: "Station '{station}' is not valid"
+  error_loading_station_data: "Error loading station data"
+  error_seasonal_decomposition: "Error performing seasonal decomposition: {error}"
+  error_arima_analysis: "Error in ARIMA analysis: {error}"
+  error_prophet_analysis: "Error in Prophet analysis: {error}"
+  error_trend_analysis: "Error in trend analysis: {error}"
+  error_anomaly_detection: "Error in anomaly detection: {error}"
+  error_prophet_forecast: "Error in Prophet forecasting: {error}"
+  error_arima_forecast: "Error in ARIMA forecasting: {error}"
+  error_ml_forecast: "Error in ML forecasting: {error}"
+  error_trend_forecast: "Error in trend forecasting: {error}"
+  error_export: "Error in export: {error}"

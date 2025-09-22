@@ -34,78 +34,90 @@ dataset_options = {
     'Botanic Garden': 'data/Botanic Garden.csv'
 }
 
+# List of allowed datasets (security validation)
+allowed_datasets = set(dataset_options.keys())
+
 selected_dataset = st.selectbox(
-    'Escolha o dataset abaixo',
-    list(dataset_options.keys())
+    'Choose the dataset below',
+    list(allowed_datasets)
 )
+
+# Validate selection
+if selected_dataset not in allowed_datasets:
+    st.error(f"Dataset '{selected_dataset}' is not allowed")
+    st.stop()
 
 data_file = dataset_options[selected_dataset]
 df = load_data(data_file)
 
-# Se o DataFrame estiver vazio, parar a execução
+# If DataFrame is empty, stop execution
 if df.empty:
     st.stop()
 
-# Selecionar a coluna de data/hora se 'timestamp' não estiver presente
+# Select datetime column if 'timestamp' is not present
+date_column = None
 if 'timestamp' not in df.columns:
     date_column = st.selectbox(
-        "Verifique se esta selecionado DateTime abaixo",
+        "Verify if DateTime is selected below",
         df.columns
     )
     df['timestamp'] = pd.to_datetime(df[date_column])
 else:
     df['timestamp'] = pd.to_datetime(df['timestamp'])
 
-# Seleção das variáveis para o eixo Y
-st.markdown("## Selecione as variáveis para graficar")
-columns = [col for col in df.columns if col not in ['timestamp', date_column]]
+# Selection of variables for Y-axis
+st.markdown("## Select variables to plot")
+excluded_columns = ['timestamp']
+if date_column:
+    excluded_columns.append(date_column)
+columns = [col for col in df.columns if col not in excluded_columns]
 selected_columns = st.multiselect(
-    'Quais colunas você gostaria de selecionar?',
+    'Which columns would you like to select?',
     columns
 )
 
-# Se nenhuma coluna for selecionada, parar a execução
+# If no column is selected, stop execution
 if not selected_columns:
-    st.warning("Por favor, escolha ao menos uma coluna.")
+    st.warning("Please choose at least one column.")
     st.stop()
 
-# Seleção do intervalo de tempo
-st.markdown("## Selecione o intervalo de tempo")
+# Time interval selection
+st.markdown("## Select time interval")
 min_date = df['timestamp'].min().to_pydatetime()
 max_date = df['timestamp'].max().to_pydatetime()
 
 date_range = st.slider(
-    'Selecione o intervalo de tempo',
+    'Select time interval',
     min_value=min_date,
     max_value=max_date,
     value=[min_date, max_date],
     format="MM/DD/YYYY"
 )
 
-# Filtrar os dados com base no intervalo de tempo selecionado
+# Filter data based on selected time interval
 filtered_df = df[(df['timestamp'] >= date_range[0]) & (df['timestamp'] <= date_range[1])]
 
-# Seleção do gráfico para exibição
-st.markdown("## Escolha o gráfico para exibição")
+# Chart selection for display
+st.markdown("## Choose chart for display")
 selected_plot = st.selectbox(
-    'Escolha o gráfico que deseja exibir',
-    ['Linha X vs Y', 'Matriz de Correlação', 'Box Plot', 'Histograma', 'Covariância ao longo do tempo', 'ARIMA Decomposition']
+    'Choose the chart you want to display',
+    ['Line X vs Y', 'Correlation Matrix', 'Box Plot', 'Histogram', 'Covariance over time', 'ARIMA Decomposition']
 )
 
-# Função para plotar gráfico de linha
+# Function to plot line chart
 def plot_line_chart():
     fig = px.line()
 
     for column in selected_columns:
         fig.add_scatter(x=filtered_df['timestamp'], y=filtered_df[column], mode='lines', name=column)
 
-    # Adicionar eixos Y adicionais se houver mais de 6 variáveis selecionadas
+    # Add additional Y axes if more than 6 variables are selected
     if len(selected_columns) > 6:
         for i, column in enumerate(selected_columns[6:], start=1):
             fig.update_traces(yaxis=f"y{i+1}", selector=dict(name=column))
             fig.add_scatter(x=filtered_df['timestamp'], y=filtered_df[column], mode='lines', name=column, yaxis=f"y{i+1}")
 
-        # Atualizar layout para eixos Y adicionais
+        # Update layout for additional Y axes
         fig.update_layout(
             yaxis2=dict(title=selected_columns[3], overlaying='y', side='right'),
             yaxis3=dict(title=selected_columns[4], overlaying='y', side='right', anchor='free', position=0.95),
@@ -115,7 +127,7 @@ def plot_line_chart():
 
     st.plotly_chart(fig)
 
-# Função para plotar matriz de correlação
+# Function to plot correlation matrix
 def plot_correlation_matrix():
     if len(selected_columns) > 1:
         correlation_matrix = filtered_df[selected_columns].corr()
@@ -126,48 +138,48 @@ def plot_correlation_matrix():
                              zmin=-1, zmax=1)
         st.plotly_chart(fig_corr)
     else:
-        st.warning("Selecione mais de uma coluna para visualizar a matriz de correlação.")
+        st.warning("Select more than one column to view the correlation matrix.")
 
-# Função para plotar box plot
+# Function to plot box plot
 def plot_box_plot():
     if len(selected_columns) > 0:
-        # Amostrar os dados se o conjunto for muito grande
+        # Sample data if the dataset is too large
         sample_size = min(100000, len(filtered_df))
         sampled_df = filtered_df.sample(n=sample_size, random_state=42)
         
         melted_df = sampled_df.melt(id_vars=['timestamp'], value_vars=selected_columns)
-        fig_box = px.box(melted_df, x='variable', y='value', points=False)  # Removendo pontos individuais para otimização
+        fig_box = px.box(melted_df, x='variable', y='value', points=False)  # Removing individual points for optimization
         st.plotly_chart(fig_box)
     else:
-        st.warning("Selecione pelo menos uma coluna para visualizar o box plot.")
+        st.warning("Select at least one column to view the box plot.")
 
-# Função para plotar histograma
+# Function to plot histogram
 def plot_histogram():
     if len(selected_columns) > 0:
         for column in selected_columns:
             fig_hist = px.histogram(filtered_df, x=column, nbins=30, title=f'Histograma de {column}')
             st.plotly_chart(fig_hist)
 
-            # Cálculo dos intervalos de confiança
+            # Calculation of confidence intervals
             data = filtered_df[column].dropna()
             mean = np.mean(data)
             std_dev = np.std(data)
             conf_interval = stats.norm.interval(0.95, loc=mean, scale=std_dev/np.sqrt(len(data)))
 
-            st.write(f"**{column}**: Intervalo de confiança de 95%: {conf_interval}")
+            st.write(f"**{column}**: 95% confidence interval: {conf_interval}")
     else:
-        st.warning("Selecione pelo menos uma coluna para visualizar o histograma.")
+        st.warning("Select at least one column to view the histogram.")
 
-# Função para plotar covariância ao longo do tempo
+# Function to plot covariance over time
 def plot_time_covariance():
     if len(selected_columns) < 2:
-        st.warning("Selecione pelo menos duas colunas para visualizar a covariância.")
+        st.warning("Select at least two columns to view the covariance.")
         return
 
-    # Seleção do tamanho da janela para a covariância móvel
-    window_size = st.slider("Selecione o tamanho da janela para a covariância móvel:", min_value=2, max_value=50, value=10)
+    # Selection of window size for moving covariance
+    window_size = st.slider("Select window size for moving covariance:", min_value=2, max_value=50, value=10)
 
-    # Calculando a covariância móvel
+    # Calculating moving covariance
     cov_df = pd.DataFrame()
     for i in range(len(selected_columns)):
         for j in range(i + 1, len(selected_columns)):
@@ -176,56 +188,56 @@ def plot_time_covariance():
 
     cov_df['timestamp'] = filtered_df['timestamp']
 
-    # Plotar covariância ao longo do tempo
-    fig_cov = px.scatter(cov_df, x='timestamp', y=cov_df.columns[:-1], title="Covariância ao longo do tempo")
+    # Plot covariance over time
+    fig_cov = px.scatter(cov_df, x='timestamp', y=cov_df.columns[:-1], title="Covariance over time")
 
     st.plotly_chart(fig_cov)
 
-# Função para decompor a série temporal usando ARIMA
+# Function to decompose time series using ARIMA
 def plot_arima_decomposition():
     if len(selected_columns) != 1:
-        st.warning("Selecione exatamente uma coluna para decompor a série temporal.")
+        st.warning("Select exactly one column to decompose the time series.")
         return
 
     column = selected_columns[0]
     ts_data = filtered_df.set_index('timestamp')[column].dropna()
 
-    # Pedir ao usuário para inserir o período e ordens p, d, q do modelo ARIMA
-    period = st.number_input('Insira o período da série temporal:', min_value=1, max_value=len(ts_data), value=max(12, min(len(ts_data) // 2, 2016)))
-    p = st.number_input('Ordem do componente autoregressivo (p):', min_value=0, max_value=10, value=1)
-    d = st.number_input('Ordem de diferenciação (d):', min_value=0, max_value=5, value=1)
-    q = st.number_input('Ordem da média móvel (q):', min_value=0, max_value=10, value=1)
+    # Ask user to enter period and ARIMA model orders p, d, q
+    period = st.number_input('Enter the time series period:', min_value=1, max_value=len(ts_data), value=max(12, min(len(ts_data) // 2, 2016)))
+    p = st.number_input('Autoregressive component order (p):', min_value=0, max_value=10, value=1)
+    d = st.number_input('Differencing order (d):', min_value=0, max_value=5, value=1)
+    q = st.number_input('Moving average order (q):', min_value=0, max_value=10, value=1)
 
-    # Ajustar o modelo ARIMA
+    # Fit ARIMA model
     model = ARIMA(ts_data, order=(p, d, q))
     fitted_model = model.fit()
 
-    # Decompor a série temporal
+    # Decompose time series
     decomposition = seasonal_decompose(ts_data, model='additive', period=period)
 
-    # Criação de subplots para cada componente da decomposição
+    # Create subplots for each decomposition component
     fig = make_subplots(rows=4, cols=1, shared_xaxes=True, 
-                        subplot_titles=("Dado original", "Tendência", "Sazonalidade", "Residuos"))
+                        subplot_titles=("Original data", "Trend", "Seasonality", "Residuals"))
 
-    fig.add_trace(go.Scatter(x=ts_data.index, y=ts_data, mode='lines', name='Dado original'), row=1, col=1)
-    fig.add_trace(go.Scatter(x=decomposition.trend.index, y=decomposition.trend, mode='lines', name='Tendência'), row=2, col=1)
-    fig.add_trace(go.Scatter(x=decomposition.seasonal.index, y=decomposition.seasonal, mode='lines', name='Sazonalidade'), row=3, col=1)
-    fig.add_trace(go.Scatter(x=decomposition.resid.index, y=decomposition.resid, mode='lines', name='Residuos'), row=4, col=1)
+    fig.add_trace(go.Scatter(x=ts_data.index, y=ts_data, mode='lines', name='Original data'), row=1, col=1)
+    fig.add_trace(go.Scatter(x=decomposition.trend.index, y=decomposition.trend, mode='lines', name='Trend'), row=2, col=1)
+    fig.add_trace(go.Scatter(x=decomposition.seasonal.index, y=decomposition.seasonal, mode='lines', name='Seasonality'), row=3, col=1)
+    fig.add_trace(go.Scatter(x=decomposition.resid.index, y=decomposition.resid, mode='lines', name='Residuals'), row=4, col=1)
 
-    fig.update_layout(height=800, title_text="Decomposição de série")
+    fig.update_layout(height=800, title_text="Time series decomposition")
 
     st.plotly_chart(fig)
 
-# Exibir o gráfico selecionado
-if selected_plot == 'Linha X vs Y':
+# Display selected chart
+if selected_plot == 'Line X vs Y':
     plot_line_chart()
-elif selected_plot == 'Matriz de Correlação':
+elif selected_plot == 'Correlation Matrix':
     plot_correlation_matrix()
 elif selected_plot == 'Box Plot':
     plot_box_plot()
-elif selected_plot == 'Histograma':
+elif selected_plot == 'Histogram':
     plot_histogram()
-elif selected_plot == 'Covariância ao longo do tempo':
+elif selected_plot == 'Covariance over time':
     plot_time_covariance()
 elif selected_plot == 'ARIMA Decomposition':
     plot_arima_decomposition()   

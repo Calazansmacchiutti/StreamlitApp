@@ -1,5 +1,5 @@
 """
-Sistema de Monitoramento de Estações de Tratamento - Aplicação Principal
+Water Treatment Stations Monitoring System - Main Application
 """
 
 import streamlit as st
@@ -15,10 +15,10 @@ import time
 import sys
 import os
 
-# Adicionar o diretório modules ao path
+# Add modules directory to path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'modules'))
 
-# Importações de módulos customizados
+# Custom module imports
 try:
     from modules.data_loader import DataLoader
     from modules.preprocessor import DataPreprocessor
@@ -26,24 +26,25 @@ try:
     from modules.anomaly_detection import AnomalyDetector
     from modules.visualizations import DashboardVisualizer
     from modules.alerts import AlertSystem
+    from modules.localization import localization, t
 except ImportError as e:
-    st.error(f"Erro ao importar módulos: {e}")
+    st.error(f"Error importing modules: {e}")
     st.stop()
 
-# Configuração da página
+# Page configuration
 st.set_page_config(
-    page_title="Sistema de Monitoramento - Estações de Tratamento",
+    page_title="Water Treatment Monitoring System",
     page_icon="🌊",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
         'Get Help': 'https://www.example.com/help',
         'Report a bug': "https://www.example.com/bug",
-        'About': "Sistema de Monitoramento v2.0"
+        'About': "Monitoring System v2.0"
     }
 )
 
-# CSS personalizado para melhor aparência
+# Custom CSS for better appearance
 st.markdown("""
     <style>
     .main-header {
@@ -103,7 +104,7 @@ class WaterTreatmentDashboard:
         self.initialize_components()
         
     def initialize_session_state(self):
-        """Inicializar variáveis de sessão"""
+        """Initialize session variables"""
         if 'data_loaded' not in st.session_state:
             st.session_state.data_loaded = False
         if 'current_station' not in st.session_state:
@@ -116,9 +117,14 @@ class WaterTreatmentDashboard:
             st.session_state.selected_parameters = []
         if 'date_range' not in st.session_state:
             st.session_state.date_range = None
+
+        # Reset selected parameters if containing invalid values
+        if 'selected_parameters' in st.session_state and st.session_state.selected_parameters:
+            # Clear invalid parameters like 'turbidity'
+            st.session_state.selected_parameters = []
             
     def load_configuration(self):
-        """Carregar configurações do sistema"""
+        """Load system configuration"""
         config_path = Path(__file__).parent / 'config' / 'config.yaml'
         if config_path.exists():
             with open(config_path, 'r', encoding='utf-8') as file:
@@ -127,7 +133,7 @@ class WaterTreatmentDashboard:
             self.config = self.get_default_config()
             
     def get_default_config(self):
-        """Configurações padrão"""
+        """Default configuration"""
         return {
             'stations': {
                 'Two Mouths': {
@@ -162,7 +168,7 @@ class WaterTreatmentDashboard:
         }
         
     def initialize_components(self):
-        """Inicializar componentes do sistema"""
+        """Initialize system components"""
         self.data_loader = DataLoader()
         self.preprocessor = DataPreprocessor()
         self.time_series = TimeSeriesAnalyzer()
@@ -171,84 +177,101 @@ class WaterTreatmentDashboard:
         self.alert_system = AlertSystem()
         
     def render_header(self):
-        """Renderizar cabeçalho do dashboard"""
+        """Render dashboard header"""
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            st.markdown('<h1 class="main-header">Sistema de Monitoramento de Estações de Tratamento</h1>', 
+            st.markdown(f'<h1 class="main-header">{t("app_title")}</h1>',
                        unsafe_allow_html=True)
         
-        # Barra de status
+        # Status bar
         status_col1, status_col2, status_col3, status_col4 = st.columns(4)
         with status_col1:
-            st.metric("Estações Ativas", "3/3", "100%")
+            st.metric(t('active_stations'), "3/3", "100%")
         with status_col2:
-            st.metric("Alertas Ativos", len(st.session_state.alerts), 
-                     f"{len([a for a in st.session_state.alerts if a.get('severity') == 'critical'])} críticos")
+            st.metric(t('active_alerts'), len(st.session_state.alerts),
+                     f"{len([a for a in st.session_state.alerts if a.get('severity') == 'critical'])} {t('critical_alerts')}")
         with status_col3:
             compliance = self.calculate_compliance() if st.session_state.data_loaded else 94.7
-            st.metric("Taxa de Conformidade", f"{compliance:.1f}%", "+2.1%")
+            st.metric("Compliance Rate", f"{compliance:.1f}%", "+2.1%")
         with status_col4:
-            st.metric("Última Atualização", 
+            st.metric(t('last_update'), 
                      st.session_state.last_update.strftime("%H:%M:%S"),
-                     "Tempo Real")
+                     t('real_time'))
             
     def render_sidebar(self):
-        """Renderizar barra lateral"""
+        """Render sidebar"""
         with st.sidebar:
-            st.image("https://via.placeholder.com/300x100/667eea/ffffff?text=Water+Treatment", 
-                    use_column_width=True)
-            
-            st.markdown("### ⚙️ Configurações")
-            
-            # Seleção de estação
+            st.image("https://via.placeholder.com/300x100/667eea/ffffff?text=Water+Treatment",
+                    use_container_width=True)
+
+            # Language selector removed - application in English
+
+            st.markdown(f"### ⚙️ {t('settings')}")
+
+            # Station selection
+            available_stations = list(self.config['stations'].keys())
             station = st.selectbox(
-                "📍 Selecionar Estação",
-                list(self.config['stations'].keys()),
-                index=0 if not st.session_state.current_station else 
-                      list(self.config['stations'].keys()).index(st.session_state.current_station)
+                f"📍 {t('select_station')}",
+                available_stations,
+                index=0 if not st.session_state.current_station else
+                      available_stations.index(st.session_state.current_station)
+                      if st.session_state.current_station in available_stations else 0
             )
-            st.session_state.current_station = station
+
+            # Validate selected station
+            if station in available_stations:
+                st.session_state.current_station = station
+            else:
+                st.error(t('station_not_valid', station=station))
+                st.session_state.current_station = available_stations[0]
             
-            # Intervalo de tempo
-            st.markdown("### 📅 Período de Análise")
+            # Time interval
+            st.markdown(f"### 📅 {t('date_range')}")
             date_option = st.radio(
-                "Selecionar período:",
-                ["Última hora", "Últimas 24 horas", "Última semana", "Último mês", "Personalizado"]
+                t('select_period'),
+                [t('last_hour'), t('last_24_hours'), t('last_week'), t('last_month'), t('custom')]
             )
             
-            if date_option == "Personalizado":
+            if date_option == t('custom'):
                 col1, col2 = st.columns(2)
                 with col1:
-                    start_date = st.date_input("Data inicial")
-                    start_time = st.time_input("Hora inicial")
+                    start_date = st.date_input(t('report_start_date'))
+                    start_time = st.time_input(t('start_time'))
                 with col2:
-                    end_date = st.date_input("Data final")
-                    end_time = st.time_input("Hora final")
+                    end_date = st.date_input(t('report_end_date'))
+                    end_time = st.time_input(t('end_time'))
                 st.session_state.date_range = (datetime.combine(start_date, start_time),
                                              datetime.combine(end_date, end_time))
             else:
                 st.session_state.date_range = self.get_date_range(date_option)
             
-            # Parâmetros para visualização
-            st.markdown("### 📊 Parâmetros")
+            # Parameters for visualization
+            st.markdown(f"### 📊 {t('parameters')}")
             station_params = self.config['stations'][station]['parameters']
+            # Filter valid parameters from session_state
+            if hasattr(st.session_state, 'selected_parameters') and st.session_state.selected_parameters:
+                valid_defaults = [p for p in st.session_state.selected_parameters if p in station_params]
+                default_params = valid_defaults if valid_defaults else station_params[:3]
+            else:
+                default_params = station_params[:3]
+
             selected_params = st.multiselect(
-                "Selecionar parâmetros:",
+                t('select_parameters'),
                 station_params,
-                default=station_params[:3] if not st.session_state.selected_parameters else st.session_state.selected_parameters
+                default=default_params
             )
             st.session_state.selected_parameters = selected_params
-            
-            # Configurações de atualização
-            st.markdown("### 🔄 Atualização Automática")
-            auto_refresh = st.checkbox("Ativar atualização automática")
+
+            # Update settings
+            st.markdown(f"### 🔄 {t('auto_update')}")
+            auto_refresh = st.checkbox(t('enable_auto_update'))
             if auto_refresh:
-                refresh_rate = st.slider("Intervalo (segundos)", 5, 300, 60)
-                if st.button("🔄 Atualizar Agora"):
+                refresh_rate = st.slider(t('update_interval_seconds'), 5, 300, 60)
+                if st.button("🔄 Update Now"):
                     st.rerun()
                 
-            # Exportar dados
-            st.markdown("### 💾 Exportar Dados")
+            # Export data
+            st.markdown(f"### {t('export_data')}")
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("📥 CSV", use_container_width=True):
@@ -260,26 +283,26 @@ class WaterTreatmentDashboard:
             return station, selected_params, date_option
             
     def get_date_range(self, option):
-        """Obter intervalo de datas baseado na opção"""
+        """Get date range based on option"""
         now = datetime.now()
-        if option == "Última hora":
+        if option == t('last_hour'):
             return (now - timedelta(hours=1), now)
-        elif option == "Últimas 24 horas":
+        elif option == t('last_24_hours'):
             return (now - timedelta(hours=24), now)
-        elif option == "Última semana":
+        elif option == t('last_week'):
             return (now - timedelta(weeks=1), now)
-        elif option == "Último mês":
+        elif option == t('last_month'):
             return (now - timedelta(days=30), now)
         else:
             return (now - timedelta(hours=24), now)
             
     def load_station_data(self, station, date_range=None):
-        """Carregar dados da estação selecionada"""
-        # Tentar carregar dados reais primeiro
+        """Load data from selected station"""
+        # Try to load real data first
         df = self.data_loader.load_station_data(station)
         
         if df.empty:
-            # Gerar dados sintéticos para demonstração
+            # Generate synthetic data for demonstration
             df = self.data_loader.generate_synthetic_data(station)
             st.session_state.data_loaded = True
             
@@ -289,15 +312,15 @@ class WaterTreatmentDashboard:
         return df
         
     def render_main_dashboard(self, station, params, df):
-        """Renderizar dashboard principal"""
-        # Tabs para diferentes visualizações
+        """Render main dashboard"""
+        # Tabs for different visualizations
         tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-            "📊 Visão Geral", 
-            "📈 Séries Temporais", 
-            "🔍 Análise Detalhada",
-            "🔮 Previsões", 
-            "⚠️ Alertas e Anomalias",
-            "📑 Relatórios"
+            f"📊 {t('overview')}",
+            f"📈 {t('time_series')}",
+            f"🔍 {t('detailed_analysis')}",
+            f"🔮 {t('predictions')}",
+            f"⚠️ {t('anomalies')}",
+            f"📑 {t('reports')}"
         ])
         
         with tab1:
@@ -319,17 +342,17 @@ class WaterTreatmentDashboard:
             self.render_reports_tab(df, params)
             
     def render_overview_tab(self, df, params):
-        """Renderizar aba de visão geral"""
-        st.markdown("### 📊 Visão Geral da Estação")
+        """Render overview tab"""
+        st.markdown(f"### 📊 {t('overview')}")
         
-        # KPIs principais
+        # Main KPIs
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             if 'pH' in df.columns:
                 avg_ph = df['pH'].mean()
                 st.metric(
-                    "pH Médio",
+                    t('average_ph'),
                     f"{avg_ph:.2f}",
                     f"{avg_ph - 7.0:+.2f}",
                     delta_color="inverse" if abs(avg_ph - 7.0) > 0.5 else "normal"
@@ -339,7 +362,7 @@ class WaterTreatmentDashboard:
             if 'turbidity' in df.columns:
                 avg_turb = df['turbidity'].mean()
                 st.metric(
-                    "Turbidez Média (NTU)",
+                    t('average_turbidity'),
                     f"{avg_turb:.2f}",
                     f"{(avg_turb - 5.0)/5.0*100:+.1f}%"
                 )
@@ -348,7 +371,7 @@ class WaterTreatmentDashboard:
             if 'flow_rate' in df.columns:
                 current_flow = df['flow_rate'].iloc[-1]
                 st.metric(
-                    "Vazão Atual (m³/h)",
+                    t('current_flow'),
                     f"{current_flow:.0f}",
                     f"{(current_flow - df['flow_rate'].mean())/df['flow_rate'].mean()*100:+.1f}%"
                 )
@@ -362,96 +385,96 @@ class WaterTreatmentDashboard:
                 delta_color="normal" if compliance > 90 else "inverse"
             )
             
-        # Gráfico de status em tempo real
-        st.markdown("### 📈 Monitoramento em Tempo Real")
+        # Real-time status chart
+        st.markdown("### 📈 Real-Time Monitoring")
         
         if params:
             fig = self.visualizer.create_realtime_chart(df, params)
             st.plotly_chart(fig, use_container_width=True)
             
-        # Mapa de calor de correlação
+        # Correlation heatmap
         if len(params) > 1:
-            st.markdown("### 🔥 Matriz de Correlação")
+            st.markdown(f"### 🔥 {t('correlation_matrix')}")
             fig_corr = self.visualizer.create_correlation_heatmap(df, params)
             st.plotly_chart(fig_corr, use_container_width=True)
             
     def render_time_series_tab(self, df, params):
-        """Renderizar aba de séries temporais"""
-        st.markdown("### 📈 Análise de Séries Temporais")
+        """Render time series tab"""
+        st.markdown(f"### 📈 {t('time_series')}")
         
-        # Seletor de tipo de análise
+        # Analysis type selector
         analysis_type = st.selectbox(
-            "Selecionar tipo de análise:",
-            ["Decomposição Sazonal", "ARIMA", "Prophet", "Análise de Tendências"]
+            t('select_analysis_type'),
+            [t('seasonal_decomposition'), "ARIMA", "Prophet", t('trend_analysis')]
         )
         
-        selected_param = st.selectbox("Selecionar parâmetro:", params)
+        selected_param = st.selectbox(t('select_parameter'), params)
         
         if selected_param in df.columns:
-            if analysis_type == "Decomposição Sazonal":
+            if analysis_type == t('seasonal_decomposition'):
                 self.render_seasonal_decomposition(df, selected_param)
             elif analysis_type == "ARIMA":
                 self.render_arima_analysis(df, selected_param)
             elif analysis_type == "Prophet":
                 self.render_prophet_analysis(df, selected_param)
-            elif analysis_type == "Análise de Tendências":
+            elif analysis_type == t('trend_analysis'):
                 self.render_trend_analysis(df, selected_param)
                 
     def render_seasonal_decomposition(self, df, param):
-        """Renderizar decomposição sazonal"""
+        """Render seasonal decomposition"""
         try:
-            # Preparar dados
+            # Prepare data
             ts_data = df.set_index('timestamp')[param].dropna()
             
-            # Configurações de decomposição
+            # Decomposition settings
             col1, col2, col3 = st.columns(3)
             with col1:
                 model_type = st.radio("Modelo:", ["additive", "multiplicative"])
             with col2:
-                period = st.number_input("Período:", min_value=2, max_value=len(ts_data)//2, value=96)
+                period = st.number_input("Period:", min_value=2, max_value=len(ts_data)//2, value=96)
             with col3:
-                extrapolate_trend = st.checkbox("Extrapolar tendência", value=True)
+                extrapolate_trend = st.checkbox("Extrapolate trend", value=True)
             
-            # Realizar decomposição
+            # Perform decomposition
             decomposition = self.time_series.seasonal_decomposition(
                 ts_data, model=model_type, period=period
             )
             
             if 'error' not in decomposition:
-                # Criar visualização
+                # Create visualization
                 fig = self.visualizer.create_seasonal_decomposition_chart(decomposition)
                 st.plotly_chart(fig, use_container_width=True)
                 
-                # Métricas da decomposição
-                st.markdown("### 📊 Métricas da Decomposição")
+                # Decomposition metrics
+                st.markdown(f"### 📊 {t('seasonal_decomposition_metrics')}")
                 col1, col2, col3, col4 = st.columns(4)
                 
                 with col1:
                     trend_strength = 1 - np.var(decomposition['residual'].dropna()) / np.var(ts_data - decomposition['seasonal'])
-                    st.metric("Força da Tendência", f"{trend_strength:.3f}")
+                    st.metric(t('trend_strength'), f"{trend_strength:.3f}")
                     
                 with col2:
                     seasonal_strength = 1 - np.var(decomposition['residual'].dropna()) / np.var(ts_data - decomposition['trend'])
-                    st.metric("Força da Sazonalidade", f"{seasonal_strength:.3f}")
+                    st.metric(t('seasonal_strength'), f"{seasonal_strength:.3f}")
                     
                 with col3:
-                    st.metric("Variância dos Resíduos", f"{np.var(decomposition['residual'].dropna()):.3f}")
+                    st.metric(t('residuals_variance'), f"{np.var(decomposition['residual'].dropna()):.3f}")
                     
                 with col4:
-                    st.metric("Período Dominante", f"{period} obs")
+                    st.metric(t('dominant_period'), f"{period} {t('obs')}")
             else:
-                st.error(f"Erro na decomposição: {decomposition['error']}")
+                st.error(f"Decomposition error: {decomposition['error']}")
                 
         except Exception as e:
-            st.error(f"Erro ao realizar decomposição sazonal: {str(e)}")
+            st.error(f"Error performing seasonal decomposition: {str(e)}")
             
     def render_arima_analysis(self, df, param):
-        """Renderizar análise ARIMA"""
+        """Render ARIMA analysis"""
         try:
             ts_data = df.set_index('timestamp')[param].dropna()
             
-            # Configurações ARIMA
-            st.markdown("#### Configurações do Modelo ARIMA")
+            # ARIMA settings
+            st.markdown("#### ARIMA Model Settings")
             col1, col2, col3 = st.columns(3)
             with col1:
                 p = st.number_input("p (AR order):", min_value=0, max_value=10, value=1)
@@ -460,41 +483,41 @@ class WaterTreatmentDashboard:
             with col3:
                 q = st.number_input("q (MA order):", min_value=0, max_value=10, value=1)
                 
-            # Ajustar modelo
-            if st.button("Ajustar Modelo ARIMA"):
-                with st.spinner("Ajustando modelo..."):
+            # Fit model
+            if st.button("Fit ARIMA Model"):
+                with st.spinner("Fitting model..."):
                     result = self.time_series.fit_arima(ts_data, order=(p, d, q))
                     
                     if 'error' not in result:
-                        # Resumo do modelo
+                        # Model summary
                         st.text(str(result['summary']))
                         
-                        # Previsões
-                        n_periods = st.slider("Períodos para previsão:", 1, 100, 24)
+                        # Predictions
+                        n_periods = st.slider("Periods for forecast:", 1, 100, 24)
                         forecast = self.time_series.forecast_arima(result['model'], n_periods)
                         
-                        # Visualização
+                        # Visualization
                         fig = go.Figure()
                         
-                        # Dados históricos
+                        # Historical data
                         fig.add_trace(go.Scatter(
                             x=ts_data.index,
                             y=ts_data.values,
                             mode='lines',
-                            name='Dados Históricos',
+                            name=t('historical_data'),
                             line=dict(color='blue')
                         ))
                         
-                        # Valores ajustados
+                        # Fitted values
                         fig.add_trace(go.Scatter(
                             x=ts_data.index,
                             y=result['fitted_values'],
                             mode='lines',
-                            name='Valores Ajustados',
+                            name='Fitted Values',
                             line=dict(color='red', dash='dash')
                         ))
                         
-                        # Previsões
+                        # Forecasts
                         future_dates = pd.date_range(
                             start=ts_data.index[-1] + pd.Timedelta(minutes=15),
                             periods=n_periods,
@@ -505,44 +528,44 @@ class WaterTreatmentDashboard:
                             x=future_dates,
                             y=forecast,
                             mode='lines',
-                            name='Previsão',
+                            name=t('forecast'),
                             line=dict(color='green')
                         ))
                         
                         fig.update_layout(
-                            title=f"Modelo ARIMA({p},{d},{q}) - {param}",
-                            xaxis_title="Tempo",
+                            title=f"ARIMA Model ({p},{d},{q}) - {param}",
+                            xaxis_title="Time",
                             yaxis_title=param,
                             height=500
                         )
                         
                         st.plotly_chart(fig, use_container_width=True)
                     else:
-                        st.error(f"Erro no modelo ARIMA: {result['error']}")
+                        st.error(f"ARIMA model error: {result['error']}")
                         
         except Exception as e:
-            st.error(f"Erro na análise ARIMA: {str(e)}")
+            st.error(f"ARIMA analysis error: {str(e)}")
             
     def render_prophet_analysis(self, df, param):
-        """Renderizar análise Prophet"""
+        """Render Prophet analysis"""
         try:
-            if st.button("Ajustar Modelo Prophet"):
-                with st.spinner("Ajustando modelo Prophet..."):
+            if st.button("Fit Prophet Model"):
+                with st.spinner("Fitting Prophet model..."):
                     result = self.time_series.fit_prophet(df, param)
                     
                     if 'error' not in result:
-                        # Visualizar previsões
+                        # Visualize forecasts
                         fig = self.visualizer.create_forecast_chart(df, param, result['forecast'])
                         st.plotly_chart(fig, use_container_width=True)
                         
-                        # Mostrar componentes
+                        # Show components
                         if 'components' in result:
-                            st.markdown("#### Componentes do Modelo")
+                            st.markdown("#### Model Components")
                             components = result['components']
                             
                             fig_comp = make_subplots(
                                 rows=3, cols=1,
-                                subplot_titles=('Tendência', 'Sazonalidade Diária', 'Sazonalidade Semanal'),
+                                subplot_titles=('Trend', 'Daily Seasonality', 'Weekly Seasonality'),
                                 vertical_spacing=0.1
                             )
                             
@@ -567,60 +590,60 @@ class WaterTreatmentDashboard:
                             fig_comp.update_layout(height=600, showlegend=False)
                             st.plotly_chart(fig_comp, use_container_width=True)
                     else:
-                        st.error(f"Erro no modelo Prophet: {result['error']}")
+                        st.error(f"Prophet model error: {result['error']}")
                         
         except Exception as e:
-            st.error(f"Erro na análise Prophet: {str(e)}")
+            st.error(f"Prophet analysis error: {str(e)}")
             
     def render_trend_analysis(self, df, param):
-        """Renderizar análise de tendências"""
+        """Render trend analysis"""
         try:
             fig = self.visualizer.create_trend_analysis_chart(df, param)
             st.plotly_chart(fig, use_container_width=True)
             
-            # Calcular taxa de mudança
+            # Calculate rate of change
             from sklearn.linear_model import LinearRegression
             X = np.arange(len(df)).reshape(-1, 1)
             y = df[param].values
             model = LinearRegression()
             model.fit(X, y)
             slope = model.coef_[0]
-            st.info(f"📈 Taxa de mudança: {slope:.4f} unidades por observação")
+            st.info(f"📈 Rate of change: {slope:.4f} units per observation")
             
         except Exception as e:
-            st.error(f"Erro na análise de tendências: {str(e)}")
+            st.error(f"Trend analysis error: {str(e)}")
             
     def render_detailed_analysis_tab(self, df, params):
-        """Renderizar análise detalhada"""
-        st.markdown("### 🔍 Análise Detalhada de Parâmetros")
+        """Render detailed analysis tab"""
+        st.markdown(f"### 🔍 {t('detailed_analysis')}")
         
-        # Seleção de parâmetros para análise
+        # Parameter selection for analysis
         selected_params = st.multiselect(
-            "Selecionar parâmetros para análise:",
+            t('select_parameters'),
             params,
             default=params[:2] if len(params) >= 2 else params
         )
-        
+
         if len(selected_params) == 0:
-            st.warning("Por favor, selecione pelo menos um parâmetro.")
+            st.warning(t('select_parameters_msg'))
             return
             
-        # Análise estatística
-        st.markdown("#### 📊 Estatísticas Descritivas")
+        # Statistical analysis
+        st.markdown(f"#### 📊 {t('descriptive_statistics')}")
         stats_dict = self.preprocessor.calculate_statistics(df, selected_params)
         
-        # Criar DataFrame com estatísticas
+        # Create DataFrame with statistics
         stats_df = pd.DataFrame(stats_dict).T
         st.dataframe(stats_df, use_container_width=True)
         
-        # Análise de distribuição
-        st.markdown("#### 📈 Análise de Distribuição")
+        # Distribution analysis
+        st.markdown(f"#### 📈 {t('distribution_analysis')}")
         
         for param in selected_params:
             col1, col2, col3 = st.columns([2, 2, 1])
             
             with col1:
-                # Histograma com curva de densidade
+                # Histogram with density curve
                 fig_hist = self.visualizer.create_distribution_plot(df, param)
                 st.plotly_chart(fig_hist, use_container_width=True)
                 
@@ -630,77 +653,77 @@ class WaterTreatmentDashboard:
                 st.plotly_chart(fig_box, use_container_width=True)
                 
             with col3:
-                # Métricas estatísticas
+                # Statistical metrics
                 st.markdown(f"**{param}**")
                 if param in stats_dict:
                     stats = stats_dict[param]
-                    st.metric("Média", f"{stats['mean']:.2f}")
-                    st.metric("Desvio Padrão", f"{stats['std']:.2f}")
+                    st.metric(t('mean'), f"{stats['mean']:.2f}")
+                    st.metric(t('std_dev'), f"{stats['std']:.2f}")
                     st.metric("CV (%)", f"{stats['cv']:.1f}")
                     
-                    # Teste de normalidade
+                    # Normality test
                     if stats['skewness'] < 0.5 and stats['kurtosis'] < 0.5:
-                        st.success("Distribuição Normal")
+                        st.success(t('normal_distribution'))
                     else:
-                        st.warning("Distribuição Não-Normal")
+                        st.warning(t('non_normal_distribution'))
                         
     def render_predictions_tab(self, df, params):
-        """Renderizar aba de previsões"""
-        st.markdown("### 🔮 Previsões e Modelagem Preditiva")
+        """Render predictions tab"""
+        st.markdown(f"### 🔮 {t('predictions')} and Predictive Modeling")
         
-        # Seleção do modelo
+        # Model selection
         model_type = st.selectbox(
-            "Selecionar modelo de previsão:",
-            ["Prophet", "ARIMA", "Random Forest", "Análise de Tendência"]
+            t('select_prediction_model'),
+            ["Prophet", "ARIMA", t('random_forest'), t('trend_analysis')]
         )
         
-        selected_param = st.selectbox("Parâmetro para previsão:", params)
+        selected_param = st.selectbox("Parameter for prediction:", params)
         
         if selected_param in df.columns:
-            # Configurações de previsão
+            # Prediction settings
             col1, col2, col3 = st.columns(3)
             with col1:
                 forecast_horizon = st.number_input(
-                    "Horizonte de previsão (horas):",
+                    t('prediction_horizon_hours'),
                     min_value=1,
                     max_value=168,
                     value=24
                 )
             with col2:
                 confidence_level = st.slider(
-                    "Nível de confiança (%):",
+                    t('confidence_level'),
                     min_value=80,
                     max_value=99,
                     value=95
                 )
             with col3:
-                include_exogenous = st.checkbox("Incluir variáveis exógenas")
+                include_exogenous = st.checkbox(t('include_exogenous'))
                 
-            if st.button("🚀 Gerar Previsões"):
-                with st.spinner(f"Treinando modelo {model_type}..."):
+            if st.button(t('generate_predictions')):
+                with st.spinner(f"Training {model_type} model..."):
                     if model_type == "Prophet":
                         self.render_prophet_forecast(df, selected_param, forecast_horizon)
                     elif model_type == "ARIMA":
                         self.render_arima_forecast(df, selected_param, forecast_horizon)
-                    elif model_type == "Random Forest":
+                    elif model_type == t('random_forest'):
                         self.render_ml_forecast(df, selected_param, forecast_horizon, "random_forest")
-                    elif model_type == "Análise de Tendência":
+                    elif model_type == t('trend_analysis'):
                         self.render_trend_forecast(df, selected_param, forecast_horizon)
                         
     def render_prophet_forecast(self, df, param, horizon):
-        """Renderizar previsões Prophet"""
+        """Render Prophet forecasts"""
         try:
             result = self.time_series.fit_prophet(df, param)
             if 'error' not in result:
                 fig = self.visualizer.create_forecast_chart(df, param, result['forecast'])
                 st.plotly_chart(fig, use_container_width=True)
             else:
-                st.error(f"Erro no Prophet: {result['error']}")
+                st.error(f"Prophet error: {result['error']}")
         except Exception as e:
-            st.error(f"Erro nas previsões Prophet: {str(e)}")
+            st.error(f"Prophet forecasting error: {str(e)}")
             
     def render_arima_forecast(self, df, param, horizon):
-        """Renderizar previsões ARIMA"""
+        """Render ARIMA forecasts"""
         try:
             ts_data = df.set_index('timestamp')[param].dropna()
             result = self.time_series.fit_arima(ts_data, order=(1, 1, 1))
@@ -709,25 +732,25 @@ class WaterTreatmentDashboard:
                 forecast = self.time_series.forecast_arima(result['model'], horizon * 4)
                 
                 fig = go.Figure()
-                fig.add_trace(go.Scatter(x=ts_data.index, y=ts_data.values, 
-                                       mode='lines', name='Histórico'))
+                fig.add_trace(go.Scatter(x=ts_data.index, y=ts_data.values,
+                                       mode='lines', name=t('historical_data')))
                 fig.add_trace(go.Scatter(x=pd.date_range(ts_data.index[-1], periods=horizon*4, freq='15T'),
-                                       y=forecast, mode='lines', name='Previsão'))
-                fig.update_layout(title=f"Previsão ARIMA - {param}")
+                                       y=forecast, mode='lines', name=t('forecast')))
+                fig.update_layout(title=f"ARIMA Forecast - {param}")
                 st.plotly_chart(fig, use_container_width=True)
             else:
-                st.error(f"Erro no ARIMA: {result['error']}")
+                st.error(f"ARIMA error: {result['error']}")
         except Exception as e:
-            st.error(f"Erro nas previsões ARIMA: {str(e)}")
+            st.error(f"ARIMA forecasting error: {str(e)}")
             
     def render_ml_forecast(self, df, param, horizon, model_type):
-        """Renderizar previsões de ML"""
+        """Render ML forecasts"""
         try:
             result = self.time_series.fit_ml_model(df, param, model_type)
             if 'error' not in result:
-                st.success(f"Modelo treinado com R² = {result['r2']:.3f}")
+                st.success(f"Model trained with R² = {result['r2']:.3f}")
                 
-                # Fazer previsões
+                # Make predictions
                 last_values = df[param].tail(96)
                 predictions = self.time_series.forecast_ml(
                     result['model'], result['scaler'], result['feature_columns'], 
@@ -735,19 +758,19 @@ class WaterTreatmentDashboard:
                 )
                 
                 fig = go.Figure()
-                fig.add_trace(go.Scatter(x=df['timestamp'], y=df[param], 
-                                       mode='lines', name='Histórico'))
+                fig.add_trace(go.Scatter(x=df['timestamp'], y=df[param],
+                                       mode='lines', name=t('historical_data')))
                 fig.add_trace(go.Scatter(x=pd.date_range(df['timestamp'].iloc[-1], periods=horizon*4, freq='15T'),
-                                       y=predictions, mode='lines', name='Previsão'))
-                fig.update_layout(title=f"Previsão {model_type} - {param}")
+                                       y=predictions, mode='lines', name=t('forecast')))
+                fig.update_layout(title=f"{model_type} Forecast - {param}")
                 st.plotly_chart(fig, use_container_width=True)
             else:
-                st.error(f"Erro no modelo ML: {result['error']}")
+                st.error(f"ML model error: {result['error']}")
         except Exception as e:
-            st.error(f"Erro nas previsões ML: {str(e)}")
+            st.error(f"ML forecasting error: {str(e)}")
             
     def render_trend_forecast(self, df, param, horizon):
-        """Renderizar previsões de tendência"""
+        """Render trend forecasts"""
         try:
             from sklearn.linear_model import LinearRegression
             X = np.arange(len(df)).reshape(-1, 1)
@@ -755,55 +778,55 @@ class WaterTreatmentDashboard:
             model = LinearRegression()
             model.fit(X, y)
             
-            # Previsões
+            # Predictions
             future_X = np.arange(len(df), len(df) + horizon * 4).reshape(-1, 1)
             predictions = model.predict(future_X)
             
             fig = go.Figure()
-            fig.add_trace(go.Scatter(x=df['timestamp'], y=df[param], 
-                                   mode='lines', name='Histórico'))
+            fig.add_trace(go.Scatter(x=df['timestamp'], y=df[param],
+                                   mode='lines', name=t('historical_data')))
             fig.add_trace(go.Scatter(x=pd.date_range(df['timestamp'].iloc[-1], periods=horizon*4, freq='15T'),
-                                   y=predictions, mode='lines', name='Previsão Linear'))
-            fig.update_layout(title=f"Previsão de Tendência - {param}")
+                                   y=predictions, mode='lines', name=t('linear_prediction')))
+            fig.update_layout(title=f"Trend Forecast - {param}")
             st.plotly_chart(fig, use_container_width=True)
             
         except Exception as e:
-            st.error(f"Erro nas previsões de tendência: {str(e)}")
+            st.error(f"Trend forecasting error: {str(e)}")
             
     def render_alerts_tab(self, df, params):
-        """Renderizar aba de alertas e anomalias"""
-        st.markdown("### ⚠️ Sistema de Alertas e Detecção de Anomalias")
+        """Render alerts and anomalies tab"""
+        st.markdown(f"### {t('alerts_anomalies_system')}")
         
-        # Configurações de detecção
+        # Detection settings
         col1, col2, col3 = st.columns(3)
         with col1:
             detection_method = st.selectbox(
-                "Método de detecção:",
+                t('detection_method'),
                 ["Isolation Forest", "DBSCAN", "One-Class SVM", "Z-Score", "IQR"]
             )
         with col2:
             sensitivity = st.slider(
-                "Sensibilidade:",
+                t('sensitivity_threshold'),
                 min_value=0.1,
                 max_value=1.0,
                 value=0.5,
                 step=0.1
             )
         with col3:
-            auto_alert = st.checkbox("Alertas automáticos", value=True)
+            auto_alert = st.checkbox(t('auto_alerts'), value=True)
             
-        # Detectar anomalias
-        if st.button("🔍 Detectar Anomalias"):
-            with st.spinner("Detectando anomalias..."):
+        # Detect anomalies
+        if st.button("🔍 Detect Anomalies"):
+            with st.spinner("Detecting anomalies..."):
                 anomalies = self.detect_anomalies(df, params, detection_method, sensitivity)
                 
                 if len(anomalies) > 0:
                     self.render_anomaly_results(anomalies, df, params)
                 else:
-                    st.success("✅ Nenhuma anomalia detectada no período selecionado!")
+                    st.success(t('no_anomalies_detected'))
                     
     def detect_anomalies(self, df, params, method, sensitivity):
-        """Detectar anomalias nos dados"""
+        """Detect anomalies in data"""
         try:
             if method == "Isolation Forest":
                 df_anomalies = self.anomaly_detector.detect_anomalies_isolation_forest(
@@ -826,7 +849,7 @@ class WaterTreatmentDashboard:
             else:
                 df_anomalies = df
                 
-            # Converter para lista de anomalias
+            # Convert to anomalies list
             anomalies_list = []
             for param in params:
                 anomaly_col = f'{param}_anomaly'
@@ -844,7 +867,7 @@ class WaterTreatmentDashboard:
             return anomalies_list
             
         except Exception as e:
-            st.error(f"Erro na detecção de anomalias: {str(e)}")
+            st.error(f"Anomaly detection error: {str(e)}")
             return []
             
     def render_anomaly_results(self, anomalies, df, params):
@@ -886,7 +909,7 @@ class WaterTreatmentDashboard:
                 
     def render_reports_tab(self, df, params):
         """Renderizar aba de relatórios"""
-        st.markdown("### 📑 Geração de Relatórios")
+        st.markdown(f"### {t('report_generation')}")
         
         # Tipo de relatório
         report_type = st.selectbox(
@@ -920,8 +943,8 @@ class WaterTreatmentDashboard:
             report_format = st.selectbox("Formato:", ["PDF", "Excel", "HTML"])
             report_language = st.selectbox("Idioma:", ["Português", "English", "Español"])
             
-        if st.button("📄 Gerar Relatório", type="primary"):
-            with st.spinner("Gerando relatório..."):
+        if st.button(t('generate_report'), type="primary"):
+            with st.spinner(t('generating_report')):
                 time.sleep(2)
                 
                 # Preview do relatório
@@ -1023,7 +1046,7 @@ class WaterTreatmentDashboard:
             # Renderizar dashboard principal
             self.render_main_dashboard(station, params, df)
         else:
-            st.error("Erro ao carregar dados da estação")
+            st.error(t('error_loading_station_data'))
             
         # Footer
         st.markdown("---")
